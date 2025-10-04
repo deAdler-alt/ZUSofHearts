@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZUS Life — Stół gry (alive, no cards)</title>
+  <link rel="stylesheet" href="board.css">
+</head>
+<body>
+  <main class="stage">
+    <!-- Stół gry (responsywny, 16:9) -->
+    <section class="board" aria-label="Stół do gry — żywy, bez kart">
+      <!-- Rama drewna (pseudo-elementy robią bejce, słoje, ranty) -->
+      <div class="wood" aria-hidden="true"></div>
+
+      <!-- Płótno stołu (mięta) -->
+      <div class="cloth">
+        <!-- Parchment (centrum na akcje backendu: bannery, komunikaty) -->
+        <div class="parchment" role="img" aria-label="Pole centralne">
+          <div class="parchment__shine" aria-hidden="true"></div>
+          <div class="parchment__grain" aria-hidden="true"></div>
+        </div>
+
+        <!-- Wstęgi (żyją bez JS) -->
+        <div class="ribbon ribbon--left" aria-hidden="true"></div>
+        <div class="ribbon ribbon--right" aria-hidden="true"></div>
+
+        <!-- Ścieżka życia — slot na pionek (backend może go wstawić jako .pawn) -->
+        <div class="life-track" aria-label="Ścieżka życia">
+          <i class="node node--start" title="Start"></i>
+          <i class="node" title="Edukacja"></i>
+          <i class="node" title="Praca"></i>
+          <i class="node" title="Rodzina"></i>
+          <i class="node" title="Dom"></i>
+          <i class="node" title="ZUS"></i>
+          <i class="node node--finish" title="Meta"></i>
+        </div>
+      </div>
+
+      <!-- Ozdoby: lewa „wieżyczka ZUS”, prawa grupa kryształów, dolne liście -->
+      <div class="orn orn--left" aria-hidden="true">
+        <div class="cap"></div><div class="pillar"></div><div class="moss"></div>
+      </div>
+      <div class="orn orn--right" aria-hidden="true">
+        <div class="shard s1"></div><div class="shard s2"></div><div class="shard s3"></div>
+        <div class="glow"></div>
+      </div>
+      <div class="orn orn--bottom" aria-hidden="true">
+        <div class="leaf l1"></div><div class="leaf l2"></div><div class="leaf l3"></div>
+      </div>
+
+      <!-- Ambient: delikatny pył/poświaty (czysto CSS) -->
+      <div class="ambient ambient--dust" aria-hidden="true"></div>
+      <div class="ambient ambient--glow" aria-hidden="true"></div>
+    </section>
+  </main>
+</body>
+</html>
+
