@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bieg przez życie — LITE</title>
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React 18 UMD + Babel Standalone (do szybkiego prototypowania) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useReducer, useEffect, useState } = React;
+
+    // =========================
+    // PARAMETRY LITE
+    // =========================
+    const START_AGE = 18;
+    const MAX_AGE = 95;
+    const TIME_PER_YEAR = 6;
+    const START_BUDGET = 2000;
+    const HEALTH_DECAY_PER_YEAR = 1.2;
+    const RETIREMENT_BASE = 65;
+
+    // Proste oferty pracy
+    const JOBS = [
+      { id: 'none', title: 'brak', grossYear: 0, contract: 'OFF', stress: 0.0, eduReq: 0 },
+      { id: 'sprzedawca', title: 'Sprzedawca', grossYear: 60000, contract: 'UoP', stress: 0.3, eduReq: 0 },
+      { id: 'technik', title: 'Technik IT', grossYear: 96000, contract: 'UoP', stress: 0.5, eduReq: 1 },
+      { id: 'programista', title: 'Programista', grossYear: 180000, contract: 'B2B', stress: 0.7, eduReq: 2 },
+    ];
+
+    function netFactorFor(contract){
+      if (contract === 'UoP') return 0.72;
+      if (contract === 'B2B') return 0.85;
+      return 0.95;
+    }
+
+    // Karty — ultra skrót
+    function cardAction(name, text, effects, timeCost, tag){
+      return { id: name.toLowerCase().replace(/[^a-z0-9]+/g,'-'), type:'ACTION', name, text, effects, timeCost, tag };
+    }
+    function cardAura(name, text, effects, timeCost, tag){
+      return { id: name.toLowerCase().replace(/[^a-z0-9]+/g,'-'), type:'AURA', name, text, effects, timeCost, tag };
+    }
+    function cardRisk(name, text, effects){
+      return { id: name.toLowerCase().replace(/[^a-z0-9]+/g,'-'), type:'RISK', name, text, effects, timeCost: 0, tag:'Ryzyko' };
+    }
+
+    const BASE_DECK = [
+      cardAction('Trening i dieta', '+6 zdrowia, +2 szczęścia', { health:+6, happiness:+2 }, 2, 'Zdrowie'),
+      cardAura('Biegaj w tygodniu', '+2 zdrowia rocznie', { healthPerYear:+2 }, 2, 'Zdrowie'),
+      cardAction('Urlop regeneracyjny', '+5 szczęścia, +2 zdrowia', { happiness:+5, health:+2 }, 2, 'Hobby'),
+      cardAction('Kurs online (IT)', '+1 edukacja', { eduInstant:+1 }, 2, 'Edukacja'),
+      cardAction('Załóż poduszkę', '+5000 zł', { cash:+5000 }, 1, 'Finanse'),
+      cardAura('Oszczędzanie 4%', '+4% rocznie na oszczędnościach', { roiSavingsPct:+4 }, 1, 'Finanse'),
+      cardAction('Ślub/partnerstwo', '+4 szczęścia, +20% kosztów', { happiness:+4, lifestyleInflation:0.2, family:1 }, 2, 'Rodzina'),
+      cardAction('Dziecko', '+5 szczęścia, +8k/rok kosztów', { happiness:+5, child:1, childCostYear:8000 }, 2, 'Rodzina'),
+      // Ryzyka (losowe przy końcu tury)
+      cardRisk('Choroba', '-10 zdrowia, -3000 zł', { health:-10, cash:-3000 }),
+      cardRisk('Wypadek', '-18 zdrowia, 1 rok bez pracy', { health:-18, disableWorkYears:1 }),
+      cardRisk('Utrata pracy', '0 dochodu do zmiany', { jobLoss:1 }),
+    ];
+
+    function initialState(){
+      return {
+        age: START_AGE,
+        yearTime: TIME_PER_YEAR,
+        deck: shuffle([...BASE_DECK]),
+        hand: [],
+        auras: [],
+        eduLevel: 0,
+        eduProgress: 0,
+        job: JOBS[0],
+        disableWorkYears: 0,
+        health: 80,
+        happiness: 60,
+        cash: START_BUDGET,
+        zus: 0,
+        roiSavingsPct: 0,
+        lifestyleInflation: 0,
+        family: 0,
+        childCount: 0,
+        history: [{ year: START_AGE, cash: START_BUDGET, health: 80, happiness: 60, zus: 0 }],
+        retired: false,
+        retirementAge: RETIREMENT_BASE,
+        gameOver: false,
+        summary: null,
+      };
+    }
+
+    function reducer(state, action){
+      switch(action.type){
+        case 'DRAW':{
+          if (state.hand.length >= 5) return state;
+          const deck = [...state.deck];
+          const hand = [...state.hand];
+          while (hand.length < 5 && deck.length) hand.push(deck.shift());
+          return { ...state, deck, hand };
+        }
+        case 'PLAY':{
+          const card = action.card;
+          if (!card) return state;
+          if (state.yearTime < card.timeCost) return state;
+          const hand = state.hand.filter(c => c.id !== card.id);
+          let s = { ...state, hand, yearTime: state.yearTime - card.timeCost };
+          s = applyEffects(s, card.effects, { auraBoost: card.type === 'AURA' });
+          if (card.type === 'AURA') s = { ...s, auras: upsertAura(s.auras, card) };
+          return s;
+        }
+        case 'END_YEAR':{
+          let s = { ...state };
+          let health = clamp(s.health - HEALTH_DECAY_PER_YEAR, 0, 100);
+
+          // Aury
+          for (const a of s.auras){
+            health = clamp(health + (a.effects.healthPerYear || 0), 0, 100);
+            s.happiness = clamp(s.happiness + (a.effects.happinessPerYear || 0), 0, 100);
+            if (a.effects.roiSavingsPct) s.roiSavingsPct = clampPct((s.roiSavingsPct||0) + a.effects.roiSavingsPct);
+            if (a.effects.eduProgressYears){
+              s.eduProgress = (s.eduProgress||0) + 1;
+              if (s.eduProgress >= a.effects.eduProgressYears){ s.eduProgress = 0; s.eduLevel = clampEdu(s.eduLevel + 1); }
+            }
+          }
+
+          // Praca
+          let income = 0, zusAdd = 0;
+          if (!s.retired && s.disableWorkYears <= 0 && s.job && s.job.id !== 'none'){
+            income = Math.round(s.job.grossYear * netFactorFor(s.job.contract));
+            const pensionRate = s.job.contract === 'UoP' ? 0.1952 : s.job.contract === 'B2B' ? 0.08 : 0;
+            zusAdd = Math.round(s.job.grossYear * pensionRate);
+          }
+          if (s.disableWorkYears > 0) s.disableWorkYears -= 1;
+
+          const lifeCosts = Math.round((18000 + s.childCount * 8000) * (1 + s.lifestyleInflation));
+          let cash = s.cash + income - lifeCosts;
+          if (s.roiSavingsPct && cash > 0) cash += Math.round(cash * s.roiSavingsPct / 100);
+          let zus = s.zus + zusAdd;
+
+          // Emerytura
+          let retired = s.retired;
+          if (!retired && s.age + 1 >= s.retirementAge) retired = true;
+          if (retired){ cash += Math.round((zus / Math.max(60, (85 - (s.age+1)) * 12)) * 12); }
+
+          // Ryzyko proste
+          const riskChance = Math.min(0.25, 0.06 + (s.age - 40) * 0.002);
+          if (Math.random() < riskChance){
+            const risks = BASE_DECK.filter(c=>c.type==='RISK');
+            const r = risks[Math.floor(Math.random()*risks.length)];
+            const t = applyEffects({ ...s, cash, zus, retired, health }, r.effects);
+            cash = t.cash; zus = t.zus; retired = t.retired; health = t.health; s.happiness = t.happiness; s.disableWorkYears = t.disableWorkYears || s.disableWorkYears;
+          }
+
+          const newAge = s.age + 1;
+          const newEntry = { year: newAge, cash, health, happiness: s.happiness, zus };
+
+          // Zgon/kres
+          const deathRoll = clamp((Math.max(0, newAge-60))*0.01 + Math.max(0, 60-health)*0.006, 0, 0.6);
+          let gameOver = s.gameOver, summary=null;
+          if (Math.random() < deathRoll || newAge >= MAX_AGE){ gameOver = true; summary={ age:newAge, cash, zus, happiness:s.happiness }; }
+
+          // Reset zasobów roku i ew. przetasowanie
+          let deck = [...s.deck];
+          let hand = [];
+          if (deck.length === 0) deck = shuffle(BASE_DECK);
+
+          return {
+            ...s,
+            age: newAge,
+            health, cash, zus,
+            retired,
+            yearTime: TIME_PER_YEAR,
+            history: [...s.history, newEntry],
+            deck, hand,
+            gameOver, summary,
+          };
+        }
+        case 'CHOOSE_JOB':{
+          return { ...state, job: action.job };
+        }
+        case 'RESET':{
+          return initialState();
+        }
+        default: return state;
+      }
+    }
+
+    function upsertAura(arr, aura){
+      if (arr.find(a=>a.id===aura.id)) return arr;
+      return [aura, ...arr];
+    }
+
+    function applyEffects(s, eff={}){
+      const t = { ...s };
+      if (eff.health !== undefined) t.health = clamp(t.health + eff.health, 0, 100);
+      if (eff.happiness !== undefined) t.happiness = clamp(t.happiness + eff.happiness, 0, 100);
+      if (eff.cash !== undefined) t.cash = Math.max(0, Math.round(t.cash + eff.cash));
+      if (eff.cashMultiplier !== undefined) t.cash = Math.round(t.cash * eff.cashMultiplier);
+      if (eff.eduInstant) t.eduLevel = clampEdu((t.eduLevel||0) + eff.eduInstant);
+      if (eff.lifestyleInflation) t.lifestyleInflation = clampInfl((t.lifestyleInflation||0) + eff.lifestyleInflation);
+      if (eff.child) t.childCount = (t.childCount||0) + 1;
+      if (eff.childCostYear) t.lifestyleInflation = clampInfl((t.lifestyleInflation||0) + eff.childCostYear/40000);
+      if (eff.disableWorkYears) t.disableWorkYears = (t.disableWorkYears||0) + eff.disableWorkYears;
+      if (eff.jobLoss) t.job = JOBS[0];
+      if (eff.forceRetire) t.retired = true;
+      return t;
+    }
+
+    function clamp(n, min, max){ return Math.min(max, Math.max(min, Math.round(n))); }
+    function clampEdu(l){ return Math.max(0, Math.min(3, l)); }
+    function clampPct(p){ return Math.max(0, Math.min(50, Math.round(p))); }
+    function clampInfl(x){ return Math.max(0, Math.min(1.5, x)); }
+    function shuffle(a){ const arr=[...a]; for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+    function fmt(n){ return n.toLocaleString('pl-PL'); }
+
+    function Badge({children}){
+      return <span className="px-2 py-1 rounded-full bg-slate-800 text-xs text-slate-200 border border-slate-700">{children}</span>;
+    }
+
+    function CardView({ card, onPlay, disabled }){
+      const tone = card.type==='RISK' ? 'border-rose-700/60 bg-rose-900/20' : card.type==='AURA' ? 'border-emerald-700/60 bg-emerald-900/10' : 'border-slate-700 bg-slate-900/40';
+      const icon = card.tag==='Zdrowie'?'❤️': card.tag==='Edukacja'?'🎓': card.tag==='Finanse'?'💰': card.tag==='Rodzina'?'👨‍👩‍👧': card.tag==='Hobby'?'🏖️':'⚙️';
+      return (
+        <div className={`rounded-2xl border p-3 shadow-sm ${tone}`}>
+          <div className="flex gap-3">
+            <div className="text-2xl select-none">{icon}</div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <Badge>{card.type}</Badge>
+                {card.tag && <Badge>{card.tag}</Badge>}
+              </div>
+              <div className="mt-1 font-semibold">{card.name}</div>
+              <div className="mt-1 text-sm text-slate-300/90">{card.text}</div>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center justify-between">
+            <div className="text-xs text-slate-400">Czas: <b className="text-slate-200">{card.timeCost}</b></div>
+            <button className="px-3 py-1 rounded-lg bg-slate-200 text-slate-900 text-sm disabled:opacity-50" onClick={()=>onPlay(card)} disabled={disabled}>Zagraj →</button>
+          </div>
+        </div>
+      );
+    }
+
+    function App(){
+      const [s, dispatch] = useReducer(reducer, undefined, initialState);
+      const [jobOpen, setJobOpen] = useState(false);
+
+      useEffect(()=>{ if (s.hand.length===0 && s.deck.length>0) dispatch({type:'DRAW'}); }, [s.hand.length, s.deck.length]);
+
+      return (
+        <div className="max-w-6xl mx-auto p-4">
+          <header className="sticky top-0 z-10 bg-slate-950/70 backdrop-blur border-b border-slate-800 mb-4">
+            <div className="py-3 flex items-center justify-between">
+              <h1 className="text-sm font-semibold tracking-wide">Bieg przez życie — Frontend LITE</h1>
+              <div className="flex gap-2">
+                <button className="px-3 py-1 rounded bg-slate-200 text-slate-900 text-sm" onClick={()=>dispatch({type:'RESET'})}>Reset</button>
+              </div>
+            </div>
+          </header>
+
+          {/* Statystyki */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            <Stat label="Wiek" value={`${s.age} lat`} />
+            <Stat label="Zdrowie" value={`${s.health}/100`} tone={s.health>=70?'good':s.health>=40?'warn':'bad'} />
+            <Stat label="Szczęście" value={`${s.happiness}/100`} tone={s.happiness>=65?'good':s.happiness>=35?'warn':'bad'} />
+            <Stat label="Oszczędności" value={`${fmt(s.cash)} zł`} />
+            <Stat label="ZUS kapitał" value={`${fmt(s.zus)} zł`} />
+            <Stat label="Edukacja" value={["Średnie","Tech/Zaw","Lic/Inż","Magister"][s.eduLevel]} />
+            <Stat label="Rodzina" value={s.childCount>0?`partner + ${s.childCount} dzieci`: s.family? 'partner':'solo'} />
+            <Stat label="Praca" value={s.job?.title||'brak'} />
+          </div>
+
+          {/* Zasoby roku */}
+          <div className="mb-4 flex items-center gap-2">
+            <div className="text-sm text-slate-300">Czas w roku:</div>
+            <div className="flex-1 h-3 rounded-full bg-slate-800"><div className="h-3 bg-emerald-600 rounded-full" style={{width:`${(s.yearTime/TIME_PER_YEAR)*100}%`}}></div></div>
+            <div className="text-xs text-slate-400 ml-2">{s.yearTime}/{TIME_PER_YEAR}</div>
+            <button className="px-3 py-1 rounded bg-slate-200 text-slate-900 text-sm" onClick={()=>dispatch({type:'DRAW'})}>Dobierz karty</button>
+            <button className="px-3 py-1 rounded bg-emerald-600 text-white text-sm" onClick={()=>dispatch({type:'END_YEAR'})} disabled={s.gameOver}>Zakończ rok</button>
+          </div>
+
+          {/* Ręka kart */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            {s.hand.length===0? <div className="text-slate-400">Brak kart — dobierz nowe.</div> : s.hand.map(c=> (
+              <CardView key={c.id} card={c} onPlay={(card)=>dispatch({type:'PLAY', card})} disabled={s.yearTime < c.timeCost || s.gameOver} />
+            ))}
+          </div>
+
+          {/* Aury + Praca */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2">
+              <div className="p-3 rounded-2xl border border-slate-800 bg-slate-900/60">
+                <div className="font-semibold mb-2">Aktywne aury</div>
+                {s.auras.length===0? <div className="text-sm text-slate-400">Brak.</div> : (
+                  <div className="flex flex-wrap gap-2">{s.auras.map(a=>(<Badge key={a.id}>{a.name}</Badge>))}</div>
+                )}
+              </div>
+            </div>
+            <div>
+              <div className="p-3 rounded-2xl border border-slate-800 bg-slate-900/60">
+                <div className="font-semibold mb-2">Praca</div>
+                <select className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700" value={s.job?.id}
+                  onChange={(e)=>{
+                    const j = JOBS.find(x=>x.id===e.target.value) || JOBS[0];
+                    dispatch({type:'CHOOSE_JOB', job:j});
+                  }}>
+                  {JOBS.map(j=>(<option key={j.id} value={j.id}>{j.title}</option>))}
+                </select>
+                <div className="text-xs text-slate-400 mt-2">Dochód netto/rok liczymy uproszczeniem zależnym od kontraktu.</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Historia (ostatnie 10 lat) */}
+          <div className="mt-4 p-3 rounded-2xl border border-slate-800 bg-slate-900/60">
+            <div className="font-semibold mb-2">Historia (ostatnie 10 lat)</div>
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-2 text-xs">
+              {s.history.slice(-10).map(h=> (
+                <div key={h.year} className="p-2 rounded bg-slate-800/60 border border-slate-700">
+                  <div className="font-semibold">{h.year}</div>
+                  <div className="opacity-80">💰 {fmt(h.cash)} zł</div>
+                  <div className="opacity-80">❤️ {h.health}</div>
+                  <div className="opacity-80">🙂 {h.happiness}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Podsumowanie */}
+          {s.gameOver && (
+            <div className="mt-4 p-4 rounded-2xl border border-slate-800 bg-rose-900/20">
+              <div className="text-lg font-bold">Koniec gry</div>
+              <div className="text-sm text-slate-300">Wiek: {s.summary.age}, Oszczędności: {fmt(s.summary.cash)} zł, ZUS: {fmt(s.summary.zus)} zł, Szczęście: {s.summary.happiness}</div>
+              <button className="mt-3 px-3 py-1 rounded bg-slate-200 text-slate-900 text-sm" onClick={()=>dispatch({type:'RESET'})}>Zagraj ponownie</button>
+            </div>
+          )}
+
+          <footer className="text-xs text-slate-500 mt-8 border-t border-slate-800 pt-4">
+            LITE: jednoplikiowy frontend do szybkiego kopiowania/preview. Parametry są edukacyjne.
+          </footer>
+        </div>
+      );
+    }
+
+    function Stat({label, value, tone='default'}){
+      const toneCls = tone==='good' ? 'bg-emerald-800/50 border-emerald-700' : tone==='warn' ? 'bg-amber-800/40 border-amber-700' : tone==='bad' ? 'bg-rose-800/40 border-rose-700' : 'bg-slate-900/50 border-slate-800';
+      return (
+        <div className={`p-3 rounded-2xl border ${toneCls}`}>
+          <div className="text-xs text-slate-400">{label}</div>
+          <div className="font-semibold">{value}</div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App/>);
+  </script>
+</body>
+</html>
+
