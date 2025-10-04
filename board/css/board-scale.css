@@ -1,0 +1,24 @@
+
+:root{ --board-scale: .90; }   /* możesz zmienić na .88, .85 itd. */
+
+.stage{ /* upewniamy się, że stół jest ładnie wyśrodkowany */
+  display: grid;
+  place-items: center;
+}
+
+/* Skalowanie całego stołu */
+.board{
+  transform: scale(var(--board-scale));
+  transform-origin: center center;
+  will-change: transform;
+  /* żeby cienie nie wyglądały na „ucięte” przy skalowaniu */
+  filter: saturate(1.02);
+}
+
+/* Minimalne korekty dla bardzo wąskiego/krótkiego okna */
+@media (max-height: 800px){
+  :root{ --board-scale: .88; }
+}
+@media (min-width: 1920px){
+  :root{ --board-scale: .86; } /* 1080p/1440p zwykle fajnie siedzi .86–.90 */
+}

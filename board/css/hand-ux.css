@@ -1,0 +1,73 @@
+.card-shell{
+  --angle: calc((var(--i) - var(--center)) * var(--tilt));
+  transform:
+    translateX(calc((var(--i) - var(--center)) * var(--spread)))
+    rotate(var(--angle))
+    translateY(var(--lift))
+    scale(var(--scale));
+}
+
+/* ——— Zoom na hover: karta się „prostuje” i podnosi ——— */
+.card-shell:hover,
+.card-shell[data-selected="true"]{
+  transform:
+    translateX(calc((var(--i) - var(--center)) * var(--spread)))
+    rotate(calc(var(--angle) * 0))            /* wyprostuj */
+    translateY(calc(var(--lift) - 26px))      /* podnieś */
+    scale(calc(var(--scale) * 1.18));         /* powiększ */
+  z-index: 40;                                 /* nad innymi kartami */
+}
+
+/* ——— Licznik ręki: „x/10” ——— */
+.hand-count{
+  position:absolute; right: 10px; bottom: 18px;
+  min-width: 52px; height: 30px; padding: 0 10px;
+  display:grid; place-items:center;
+  font-weight: 900; letter-spacing:.3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border: 1px solid #e1e8f0; color: var(--ink);
+  box-shadow: 0 10px 22px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.7);
+  pointer-events: none; z-index: 41;
+}
+
+/* ——— Drop zone: miejsce na zrzut karty ——— */
+.play-dropzone{
+  position:absolute; left: 22%; right: 22%; bottom: 154px;
+  height: 84px; border-radius: 999px;
+  background:
+    linear-gradient(180deg, #ffffff, #f7fbff);
+  border: 2px dashed #cfe0ee;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.8), 0 -10px 20px rgba(0,0,0,.06);
+  display: grid; place-items: center;
+  color: #5e6c7b; font-weight: 900; letter-spacing: .3px;
+  opacity: .85; z-index: 21;
+}
+.play-dropzone > span{
+  padding:6px 10px; border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff, #f3f7fb);
+  border:1px solid #e1e8f0;
+}
+
+/* stan aktywny — np. gdy karta jest „playable” lub hover nad strefą */
+.play-dropzone[data-state="ready"]{
+  border-color: #76d79b;
+  box-shadow:
+    inset 0 0 0 2px rgba(121,230,191,.35),
+    0 0 0 6px rgba(121,230,191,.18),
+    0 -10px 20px rgba(0,0,0,.06);
+}
+
+/* ——— Zgodność z naszym layoutem FHD ——— */
+@media (min-width: 1440px){
+  .play-dropzone{ left: calc(var(--sideW) + 40px); right: calc(var(--sideW) + 40px); }
+}
+@media (max-height: 800px){
+  .play-dropzone{ bottom: 140px; height: 72px }
+}
+
+/* ——— Dark theme kontrast ——— */
+.theme-corporate-dark .play-dropzone{
+  background: linear-gradient(180deg, #2f3439, #282c30);
+  border-color:#3b4148; color:#e8eef2;
+}

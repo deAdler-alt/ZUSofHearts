@@ -1,0 +1,39 @@
+
+.turn-banner{
+  position:absolute; left:50%; top: 64px; transform: translateX(-50%) translateY(-8px) scale(.98);
+  z-index: 35; display:flex; align-items:center; gap:10px;
+  padding: 12px 18px; border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border:1px solid #e1e8f0;
+  box-shadow: 0 16px 28px rgba(0,0,0,.16), inset 0 2px 0 rgba(255,255,255,.75);
+  color:#0b1816; opacity:0; pointer-events:none;
+  transition: transform .22s var(--ease-soft, cubic-bezier(.2,.8,.2,1)), opacity .22s ease;
+}
+.turn-banner .lbl{ font-weight:900; letter-spacing:.4px }
+.turn-banner .sub{
+  font-weight:800; color:#5e6c7b; padding:6px 8px; border-radius:999px; border:1px solid #e1e8f0;
+  background: linear-gradient(180deg, #ffffff, #f3f7fb);
+}
+
+/* Kolory wg tonu */
+.turn-banner[data-tone="draw"]{   background: linear-gradient(180deg, #d8f6ff, #8fdcff); border-color:#89bdda }
+.turn-banner[data-tone="play"]{   background: linear-gradient(180deg, #c9ffdf, #98f2bb); border-color:#76d79b }
+.turn-banner[data-tone="end"]{    background: linear-gradient(180deg, #ffe8b8, #ffd27a); border-color:#e1b85c }
+.turn-banner[data-tone="enemy"]{  background: linear-gradient(180deg, #ffd0d4, #ff9aae); border-color:#ff7b86 }
+
+/* Pokazywanie */
+.turn-banner[data-show="true"]{
+  opacity:1; transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Delikatny „shine” */
+.turn-banner::after{
+  content:""; position:absolute; inset:-60% -20% 20% -20%;
+  background: radial-gradient(80% 50% at 50% 0%, rgba(255,255,255,.7), transparent 70%);
+  pointer-events:none; filter: blur(8px); opacity:.35;
+}
+
+/* Na małej wysokości niech nie nachodzi na top HUD */
+@media (max-height: 760px){
+  .turn-banner{ top: 58px; transform: translateX(-50%) scale(.96); }
+}

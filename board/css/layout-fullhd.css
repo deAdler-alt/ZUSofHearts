@@ -1,0 +1,79 @@
+
+:root{
+  /* szerokość panelu + bufor; używamy w left/right */
+  --sideW: 300px;
+  --sideGap: 24px;
+  --safeTop: 92px;   /* nad pergaminem */
+  --safeBottom: 140px; /* wysokość dla HUD bottom + ręki */
+}
+
+/* Warstwy, żeby nic się nie „przebijało” */
+.side{ z-index: 30 }
+.hud--top{ z-index: 34 }
+.hud--bottom{ z-index: 34 }
+.hand{ z-index: 28 }          /* karty pod panelami */
+.op-hand{ z-index: 28 }
+.avatar{ z-index: 32 }
+.op-avatar{ z-index: 32 }
+
+@media (min-width: 1440px){
+  /* większa plansza z oddechem */
+  .board{ width: min(92vw, 1600px) }
+
+  /* panele: wyżej i z dłuższym dołem (miejsce na rękę) */
+  .side{
+    top: var(--safeTop);
+    bottom: calc(var(--safeBottom) + 10px);
+    width: var(--sideW);
+  }
+  .side--left{ left: 18px }
+  .side--right{ right: 18px }
+
+  /* ścieżka życia — między panelami */
+  .life-track{
+    left: calc(var(--sideW) + var(--sideGap)) !important;
+    right: calc(var(--sideW) + var(--sideGap)) !important;
+    top: 23% !important;
+    height: 50% !important;
+  }
+
+  /* ręka gracza — pomiędzy panelami, nad HUD-em */
+  .hand{
+    left: calc(var(--sideW) + var(--sideGap) + 6px);
+    right: calc(var(--sideW) + var(--sideGap) + 6px);
+    bottom: calc(var(--safeBottom) + 4px);
+    height: 48%;
+    --spread: 62px; --tilt: 5deg; --scale: 1.02;
+  }
+  .card-shell{ width: 150px; height: 206px }
+
+  /* ręka przeciwnika — także między panelami u góry */
+  .op-hand{
+    left: calc(var(--sideW) + var(--sideGap) + 6px);
+    right: calc(var(--sideW) + var(--sideGap) + 6px);
+    top: 86px;
+    height: 42%;
+    --spread: 58px; --tilt: -5deg; --scale: .96;
+  }
+  .card-back{ width: 136px; height: 188px }
+
+  /* avatary: lewy dół i górny środek, poza bieżnią kart */
+  .avatar{ left: 26px; bottom: calc(var(--safeBottom) + 8px); width: 132px; height: 132px }
+  .op-avatar{ top: 10px }
+
+  /* HUD-y szerzej */
+  .hud--top, .hud--bottom{ width: calc(100% - 40px) }
+}
+
+/* Dodatkowa ochrona na ultra-szerokich (≥1920px) */
+@media (min-width: 1920px){
+  :root{ --sideW: 320px }
+  .hand{ --spread: 66px; --scale: 1.06 }
+  .life-track .node{ width: 74px; height: 74px }
+}
+
+/* Gdy jest mało miejsca w pionie, zawężamy wachlarz */
+@media (max-height: 800px){
+  .hand{ --spread: 52px; --scale: .96 }
+  .op-hand{ --spread: 48px; --scale: .92 }
+}
