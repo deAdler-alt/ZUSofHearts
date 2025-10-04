@@ -1,0 +1,34 @@
+:root{
+  /* drewno (ramka stołu) */
+  --wood-1:#cfa47a; --wood-2:#b28155; --wood-3:#8a5b35;
+  /* sukno (tło planszy) */
+  --cloth-1:#eafff4; --cloth-2:#d9f6ea; --cloth-ring:#bfeada;
+  /* pergamin (panel centralny / overlay) */
+  --parch-1:#f4e7d1; --parch-2:#e7d4b8; --parch-edge:#cbb391;
+  /* akcenty */
+  --gold:#e5c269; --mint:#79e6bf; --turq:#67c7d9; --rose:#ff7b86;
+  /* tekst */
+  --ink:#1b2430; --ink-dim:#6b7a88;
+
+  /* promienie/cienie/animacje */
+  --radius:26px;
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.18);
+  --shadow-sm: 0 10px 24px rgba(0,0,0,.12);
+  --ease-soft: cubic-bezier(.2,.8,.2,1);
+}
+
+/* Baseline */
+*{ box-sizing: border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  color:var(--ink);
+  font:16px/1.25 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+
+/* Kontener sceny: bezpieczne strefy (notch) – reszta w responsive.css */
+.stage{
+  padding-left:  max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+}

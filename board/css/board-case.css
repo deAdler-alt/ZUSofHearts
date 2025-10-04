@@ -1,0 +1,185 @@
+
+.stage{
+  min-height:100dvh;
+  display:grid; place-items:center;
+  background:
+    radial-gradient(1200px 800px at 50% -10%, #ffffff 0%, #f7efe4 55%, #ecd7be 100%);
+}
+
+/* ——— Płótno stołu ——— */
+.board{
+  position:relative;
+  width:min(96vw, 1200px);
+  aspect-ratio:16/9;
+  filter: saturate(1.02);
+  isolation:isolate; /* poprawne nakładanie cieni/ambientu */
+}
+
+/* ——— Drewniana rama z „słojami” ——— */
+.wood{
+  position:absolute; inset:0; border-radius:calc(var(--radius) + 16px);
+  background:
+    repeating-linear-gradient(14deg, rgba(0,0,0,.06) 0 2px, rgba(0,0,0,0) 2px 12px),
+    linear-gradient(180deg, var(--wood-1), var(--wood-2) 55%, var(--wood-3));
+  box-shadow:
+    inset 0 6px 0 rgba(255,255,255,.35),
+    inset 0 -8px 0 rgba(0,0,0,.15),
+    var(--shadow-lg);
+  border:1px solid rgba(73,35,15,.35);
+}
+.wood::before, .wood::after{
+  content:""; position:absolute; inset:10px; border-radius:calc(var(--radius) + 6px);
+  pointer-events:none;
+}
+.wood::before{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,0) 30%,
+                             rgba(0,0,0,.15) 100%);
+  mix-blend-mode: soft-light;
+}
+.wood::after{ border:2px solid rgba(0,0,0,.22); }
+
+/* ——— Sukno (delikatny „oddech”) ——— */
+.cloth{
+  position:absolute; inset:18px; border-radius:calc(var(--radius) + 2px);
+  background:
+    radial-gradient(180% 160% at 50% 0%, rgba(255,255,255,.8), rgba(255,255,255,.35) 60%, rgba(0,0,0,0) 90%),
+    linear-gradient(180deg, var(--cloth-1), var(--cloth-2));
+  border:2px solid var(--cloth-ring);
+  box-shadow: inset 0 10px 28px rgba(0,0,0,.08);
+  overflow:hidden;
+  animation: cloth-breathe 18s ease-in-out infinite alternate;
+}
+
+/* ——— Pergamin w centrum ——— */
+.parchment{
+  position:absolute; inset:10% 8%;
+  border-radius: 22px / 28px;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.65), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, var(--parch-1), var(--parch-2));
+  border:1px solid var(--parch-edge);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.7),
+    inset 0 -18px 28px rgba(93, 57, 24, .12);
+}
+.parchment__shine{
+  position:absolute; inset:-20% -10% 40% -10%;
+  background: radial-gradient(100% 60% at 50% 0%, rgba(255,255,255,.7), transparent 70%);
+  filter: blur(10px); opacity:.35; animation: shine 8s ease-in-out infinite;
+}
+.parchment__grain{
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.03) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.02) 0 2px, transparent 2px 6px);
+  mix-blend-mode: multiply; opacity:.6;
+}
+
+/* ——— Wstęgi (żyją delikatnie) ——— */
+.ribbon{
+  position:absolute; top:10%; bottom:10%; width:18%;
+  background: linear-gradient(180deg, #fff, #f3f7fb);
+  border:1px solid #dfe7f0; box-shadow: var(--shadow-sm);
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.12));
+  opacity:.95; border-radius:18px;
+  animation: wave 6s ease-in-out infinite;
+}
+.ribbon--left{ left:3%; transform-origin: 0% 50% }
+.ribbon--right{ right:3%; transform-origin: 100% 50%; animation-delay:-1.2s }
+
+/* ——— Ozdoby (lewa kolumienka ZUS / prawe kryształy / dolne liście) ——— */
+.orn{ position:absolute; pointer-events:none; }
+.orn--left{ left:1.6%; top:2%; width:13%; height:36%; }
+.orn--right{ right:1.8%; top:1.2%; width:15%; height:40%; }
+.orn--bottom{ left:8%; bottom:1.2%; width:22%; height:26%; }
+
+/* lewa — kapitel + filar + mech */
+.orn--left .pillar{
+  position:absolute; left:18%; right:28%; top:18%; bottom:10%;
+  background: linear-gradient(180deg, #f1f5fa, #dfe7f0);
+  border:1px solid #c9d6e2; border-radius:14px; box-shadow: var(--shadow-sm);
+  animation: floaty 5.5s ease-in-out infinite;
+}
+.orn--left .cap{
+  position:absolute; top:4%; left:12%; right:22%; height:16%;
+  background: linear-gradient(180deg, #ffeec4, #e5c269);
+  border:1px solid #caa64d; border-radius: 14px 14px 8px 8px / 14px 14px 10px 10px;
+  box-shadow: 0 10px 22px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.75);
+  animation: flicker 2.2s ease-in-out infinite;
+}
+.orn--left .moss{
+  position:absolute; bottom:6%; left:6%; right:12%; height:20%;
+  background: radial-gradient(60% 80% at 30% 60%, #b9e6c8, #7ed9a8 70%, #60b987);
+  filter: blur(.2px); border-radius:22px; opacity:.9; box-shadow: inset 0 2px 0 rgba(255,255,255,.6);
+}
+
+/* prawa — kryształy */
+.orn--right .shard{
+  position:absolute; background: linear-gradient(180deg, #d8b8ff, #a484e6);
+  border:1px solid #8e6fd3; clip-path: polygon(50% 0%, 85% 20%, 100% 50%, 75% 100%, 25% 100%, 0 50%, 15% 20%);
+  box-shadow: 0 10px 20px rgba(131, 87, 199, .2);
+  animation: pulse 3.6s ease-in-out infinite;
+}
+.orn--right .s1{ width:36%; height:38%; left:10%; top:8%; animation-delay:.1s }
+.orn--right .s2{ width:28%; height:32%; right:12%; top:10%; transform: rotate(10deg); animation-delay:.5s }
+.orn--right .s3{ width:22%; height:26%; right:24%; top:24%; transform: rotate(-6deg); animation-delay:1s }
+.orn--right .glow{
+  position:absolute; left:8%; right:8%; top:4%; bottom:16%;
+  background: radial-gradient(60% 60% at 50% 40%, rgba(185,150,255,.45), rgba(185,150,255,0) 70%);
+  filter: blur(6px); animation: glow 4.8s ease-in-out infinite;
+}
+
+/* dół — liście */
+.orn--bottom .leaf{
+  position:absolute; bottom:4%;
+  width:28%; height:42%; border-radius:80% 40% 60% 50% / 60% 40% 60% 40%;
+  background: linear-gradient(180deg, #ffe6b6, #dba774);
+  border:1px solid #bf8f5e; filter: saturate(1.1);
+  box-shadow: 0 12px 22px rgba(0,0,0,.12);
+  transform-origin: 50% 100%;
+  animation: leaf 7.5s ease-in-out infinite;
+}
+.orn--bottom .l1{ left:4%; transform: rotate(-6deg) }
+.orn--bottom .l2{ left:18%; transform: rotate(14deg); animation-delay:-1.4s }
+.orn--bottom .l3{ left:32%; transform: rotate(-2deg); animation-delay:-2.4s }
+
+/* ——— Ambient (pył + poświaty) ——— */
+.ambient{ position:absolute; inset:0; pointer-events:none; }
+.ambient--dust{
+  background:
+    radial-gradient(2px 2px at 12% 14%, rgba(255,255,255,.5), transparent 60%),
+    radial-gradient(2px 2px at 44% 28%, rgba(255,255,255,.6), transparent 60%),
+    radial-gradient(1.5px 1.5px at 66% 62%, rgba(255,255,255,.45), transparent 60%),
+    radial-gradient(1.5px 1.5px at 84% 36%, rgba(255,255,255,.45), transparent 60%),
+    radial-gradient(1.5px 1.5px at 26% 72%, rgba(255,255,255,.4), transparent 60%);
+  animation: dust 28s linear infinite;
+  opacity:.55;
+  mix-blend-mode: screen;
+}
+.ambient--glow{
+  background:
+    radial-gradient(50% 40% at 12% 16%, rgba(121,230,191,.18), transparent 70%),
+    radial-gradient(60% 45% at 86% 12%, rgba(185,150,255,.15), transparent 70%),
+    radial-gradient(60% 45% at 12% 86%, rgba(255,215,130,.12), transparent 70%);
+  filter: blur(2px);
+  animation: breathe 16s ease-in-out infinite;
+}
+
+/* ——— Animacje ——— */
+@keyframes cloth-breathe { 0%{ filter: brightness(1) saturate(1.02) } 100%{ filter: brightness(1.06) saturate(1.06) } }
+@keyframes shine         { 0%,100%{ opacity:.28; transform: translateY(0) } 50%{ opacity:.45; transform: translateY(-6%) } }
+@keyframes wave          { 0%,100%{ transform: rotate(0deg) translateY(0) } 50%{ transform: rotate(.7deg) translateY(-4px) } }
+@keyframes floaty        { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-3px) } }
+@keyframes pulse         { 0%,100%{ filter: brightness(1); box-shadow: 0 10px 20px rgba(131,87,199,.2) } 50%{ filter: brightness(1.15); box-shadow: 0 14px 28px rgba(131,87,199,.34) } }
+@keyframes glow          { 0%,100%{ opacity:.28; transform: scale(1) } 50%{ opacity:.55; transform: scale(1.05) } }
+@keyframes leaf          { 0%,100%{ transform: rotate(var(--r,0)) } 50%{ transform: rotate(calc(var(--r,0) + 3deg)) } }
+@keyframes dust          { 0%{ background-position: 0 0, 0 0, 0 0, 0 0, 0 0 } 100%{ background-position: 40vw 20vh, -30vw 40vh, 20vw -20vh, -10vw -30vh, 10vw -15vh } }
+@keyframes breathe       { 0%,100%{ opacity:.6 } 50%{ opacity:.85 } }
+@keyframes flicker       { 0%,100%{ filter: brightness(1) } 55%{ filter: brightness(1.12) } 60%{ filter: brightness(.92) } 66%{ filter: brightness(1.18) } 72%{ filter: brightness(1) } }
+
+/* ——— Reduced motion (bazowe) ——— */
+@media (prefers-reduced-motion: reduce){
+  .cloth, .ribbon, .orn--left .cap, .orn--left .pillar, .orn--right .shard,
+  .orn--right .glow, .orn--bottom .leaf, .ambient{ animation:none !important }
+}

@@ -1,0 +1,58 @@
+
+.hud--bottom{
+  position:absolute; left:50%; bottom:8px; transform:translateX(-50%);
+  width: calc(100% - 36px);
+  display:flex; align-items:center; justify-content:space-between;
+  gap: 14px; z-index:20; flex-wrap: wrap;
+}
+
+.time{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:var(--radius);
+  background: linear-gradient(180deg, #ffffff, #f6fbff);
+  border:1px solid #e1e8f0; box-shadow: var(--shadow-sm);
+  color: var(--ink);
+}
+.time .label{ font-weight:900; letter-spacing:.3px }
+
+/* Kryształy czasu */
+.crystal{
+  width:28px; height:32px;
+  clip-path: polygon(50% 0%, 85% 25%, 85% 75%, 50% 100%, 15% 75%, 15% 25%);
+  background: linear-gradient(180deg, #d8f6ff, #8fdcff);
+  border:1px solid #89bdda;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.9), 0 6px 10px rgba(0,0,0,.08);
+  opacity:.28; transition: opacity .2s ease, filter .2s ease;
+}
+.crystal.full{ opacity: 1 }
+
+/* Mapowanie data-time → ile pełnych kryształów (6 sztuk) */
+.time[data-time="0"]  .crystal{ opacity:.28 }
+.time[data-time="1"]  .crystal:nth-of-type(-n+1){ opacity:1 }
+.time[data-time="2"]  .crystal:nth-of-type(-n+2){ opacity:1 }
+.time[data-time="3"]  .crystal:nth-of-type(-n+3){ opacity:1 }
+.time[data-time="4"]  .crystal:nth-of-type(-n+4){ opacity:1 }
+.time[data-time="5"]  .crystal:nth-of-type(-n+5){ opacity:1 }
+.time[data-time="6"]  .crystal:nth-of-type(-n+6){ opacity:1 }
+
+/* CTA — Zakończ rok */
+.end-turn{
+  padding:12px 20px; border-radius:999px; font-weight:900; letter-spacing:.4px; cursor:pointer;
+  background: linear-gradient(180deg, #c9ffdf, #98f2bb);
+  color:#0c3b2a; border:1px solid #76d79b;
+  box-shadow: 0 6px 0 #6ac090, 0 12px 20px rgba(0,0,0,.12);
+  transition: transform .05s ease, box-shadow .05s ease, filter .2s ease;
+}
+.end-turn:active{ transform: translateY(2px); box-shadow: 0 4px 0 #6ac090, 0 8px 16px rgba(0,0,0,.12); }
+.end-turn[aria-disabled="true"]{
+  filter: grayscale(.3) brightness(.92); cursor: not-allowed;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+/* Responsywność */
+@media (max-width: 900px){
+  .hud--bottom{ width: calc(100% - 24px) }
+}
+@media (max-width: 640px){
+  .end-turn{ width:100% }
+}

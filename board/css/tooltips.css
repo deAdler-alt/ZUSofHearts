@@ -1,0 +1,132 @@
+[data-tip]{
+  position: relative; /* kotwica */
+  --tt-offset: 12px;          /* odsunięcie od kotwicy */
+  --tt-maxw: 260px;           /* maksymalna szerokość dymka */
+  --tt-z: 45;
+}
+
+/* Dymek */
+[data-tip]::after{
+  content: attr(data-tip);
+  position: absolute;
+  z-index: var(--tt-z);
+  max-width: var(--tt-maxw);
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13px; font-weight: 700; letter-spacing: .2px;
+  color: var(--ink);
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border: 1px solid #e1e8f0;
+  box-shadow: 0 12px 26px rgba(0,0,0,.14), inset 0 2px 0 rgba(255,255,255,.7);
+  pointer-events: none;
+  opacity: 0; transform: translateY(-6px) scale(.98);
+  transition: opacity .18s, transform .18s;
+  /* domyślna pozycja: TOP, centrowanie */
+  left: 50%; bottom: calc(100% + var(--tt-offset)); transform-origin: 50% 100%;
+  translate: -50% 0;
+  white-space: normal; line-height: 1.35;
+}
+
+/* Strzałka */
+[data-tip]::before{
+  content: ""; position: absolute; z-index: var(--tt-z);
+  width: 10px; height: 10px; rotate: 45deg;
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border-left: 1px solid #e1e8f0; border-top: 1px solid #e1e8f0;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  pointer-events: none; opacity: 0; transition: opacity .18s;
+  left: 50%; bottom: calc(100% + var(--tt-offset) - 4px); translate: -50% 0;
+}
+
+/* Pokazanie: hover lub focus klawiaturą */
+[data-tip]:hover::after,
+[data-tip]:hover::before,
+[data-tip]:focus-visible::after,
+[data-tip]:focus-visible::before,
+[data-tip][data-tip-open="true"]::after,
+[data-tip][data-tip-open="true"]::before{
+  opacity: 1;
+}
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after,
+[data-tip][data-tip-open="true"]::after{
+  transform: translateY(0) scale(1);
+}
+
+/* ===== Pozycjonowanie ===== */
+
+/* BOTTOM */
+[data-tip][data-tip-pos="bottom"]::after{
+  top: calc(100% + var(--tt-offset)); bottom: auto;
+  transform-origin: 50% 0%; translate: -50% 0;
+}
+[data-tip][data-tip-pos="bottom"]::before{
+  top: calc(100% + var(--tt-offset) - 4px); bottom: auto;
+  rotate: 45deg;
+}
+
+/* LEFT */
+[data-tip][data-tip-pos="left"]::after{
+  right: calc(100% + var(--tt-offset)); left: auto;
+  bottom: 50%; translate: 0 50%;
+  transform-origin: 100% 50%; transform: translateX(-6px) scale(.98);
+}
+[data-tip][data-tip-pos="left"]::before{
+  right: calc(100% + var(--tt-offset) - 4px); left: auto;
+  bottom: 50%; translate: 0 50%; rotate: 45deg;
+}
+
+/* RIGHT */
+[data-tip][data-tip-pos="right"]::after{
+  left: calc(100% + var(--tt-offset)); right: auto;
+  bottom: 50%; translate: 0 50%;
+  transform-origin: 0% 50%; transform: translateX(6px) scale(.98);
+}
+[data-tip][data-tip-pos="right"]::before{
+  left: calc(100% + var(--tt-offset) - 4px); right: auto;
+  bottom: 50%; translate: 0 50%; rotate: 45deg;
+}
+
+/* ===== TONY (akcenty kolorystyczne) ===== */
+[data-tip][data-tip-tone="info"]::after{
+  background: linear-gradient(180deg, #d8f6ff, #8fdcff); border-color:#89bdda; color:#0a2b4f;
+}
+[data-tip][data-tip-tone="good"]::after{
+  background: linear-gradient(180deg, #c9ffdf, #98f2bb); border-color:#76d79b; color:#0c3b2a;
+}
+[data-tip][data-tip-tone="warn"]::after{
+  background: linear-gradient(180deg, #ffe8b8, #ffd27a); border-color:#e1b85c; color:#5b3e0a;
+}
+[data-tip][data-tip-tone="neutral"]::after{
+  background: linear-gradient(180deg, #ffffff, #f6f9ff); border-color:#e1e8f0; color:var(--ink);
+}
+/* Strzałki dopasowane do tonu */
+[data-tip][data-tip-tone="info"]::before{ background: linear-gradient(180deg,#d8f6ff,#8fdcff); border-left-color:#89bdda; border-top-color:#89bdda }
+[data-tip][data-tip-tone="good"]::before{ background: linear-gradient(180deg,#c9ffdf,#98f2bb); border-left-color:#76d79b; border-top-color:#76d79b }
+[data-tip][data-tip-tone="warn"]::before{ background: linear-gradient(180deg,#ffe8b8,#ffd27a); border-left-color:#e1b85c; border-top-color:#e1b85c }
+[data-tip][data-tip-tone="neutral"]::before{ background: linear-gradient(180deg,#ffffff,#f6f9ff); border-left-color:#e1e8f0; border-top-color:#e1e8f0 }
+
+/* ===== Kolizje brzegów ekranu (soft clamp) ===== */
+/* Gdy tooltip może wyjść poza krawędzie, delikatnie go „dociągamy” */
+@media (min-width: 0px){
+  [data-tip]::after{
+    /* ogranicz przesunięcie w poziomie — „sprężynka” */
+    left: clamp(12px, 50%, calc(100% - 12px));
+    translate: clamp(-100% + 12px, -50%, -12px) 0;
+  }
+  [data-tip][data-tip-pos="left"]::after,
+  [data-tip][data-tip-pos="right"]::after{
+    bottom: clamp(12px, 50%, calc(100% - 12px));
+    translate: 0 clamp(-100% + 12px, 50%, -12px);
+  }
+}
+
+/* ===== Fokus / dostępność ===== */
+[data-tip]:focus-visible{
+  outline: 3px solid #67c7d9; outline-offset: 2px; border-radius: 8px;
+}
+
+/* ===== Reduced motion ===== */
+@media (prefers-reduced-motion: reduce){
+  [data-tip]::after{ transition: none }
+}

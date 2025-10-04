@@ -1,0 +1,107 @@
+
+.stage{
+  padding-left:  max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+  padding-top:   max(0px,  env(safe-area-inset-top));
+  padding-bottom:max(0px,  env(safe-area-inset-bottom));
+}
+
+/* --- Miękkie letterboxy dla ekstremalnych proporcji --- */
+@media (min-aspect-ratio: 21/9) {
+  .stage::after{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:1;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,.06), transparent 18%, transparent 82%, rgba(0,0,0,.06)),
+      radial-gradient(1200px 800px at 50% -10%, rgba(0,0,0,0) 0%, rgba(0,0,0,.04) 60%, rgba(0,0,0,.06) 100%);
+  }
+}
+@media (max-aspect-ratio: 3/2) {
+  .stage::after{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:1;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,.05), transparent 16%, transparent 84%, rgba(0,0,0,.05)),
+      radial-gradient(1200px 800px at 50% -10%, rgba(0,0,0,0) 0%, rgba(0,0,0,.04) 60%, rgba(0,0,0,.06) 100%);
+  }
+}
+
+/* --- Skala typografii globalnie (lekka kompresja na mobile) --- */
+@media (max-width: 900px){
+  body{ font-size: clamp(14px, 1.8vw, 16px); }
+}
+
+/* --- Szerokości/skalowanie stołu --- */
+.board{ width: min(96vw, 1200px); }
+@media (max-width: 1280px){ .board{ width: min(96vw, 1080px); } }
+@media (max-width: 1100px){ .board{ width: min(96vw, 980px); } }
+@media (max-width: 980px){  .board{ width: min(98vw, 900px); } }
+@media (max-width: 720px){  .board{ width: 100vw; } }
+
+/* --- HUD top/bottom: zawijanie i kompakt --- */
+@media (max-width: 980px){
+  .hud--top, .hud--bottom{ width: calc(100% - 24px); gap:10px }
+  .hud--top .chip{ padding:7px 10px }
+}
+@media (max-width: 760px){
+  .hud--top{ justify-content:center }
+  .hud--top .kpi{ justify-content:center }
+  .hud--bottom{ justify-content:center }
+  .hud--bottom .end-turn{ order: 2 }
+  .hud--bottom .time{ order: 1 }
+}
+
+/* --- Side panels: stopniowe zawężanie i hide pod 880px (M4) --- */
+@media (max-width: 1100px){ .side{ width:220px } }
+@media (max-width: 980px){  .side{ width:200px } }
+/* <880px panele już są display:none (patrz M4), tutaj tylko dodatki: */
+@media (max-width: 880px){
+  .panel h3{ margin-bottom:8px }
+}
+
+/* --- Ozdoby/ambient: redukcja na mobile --- */
+@media (max-width: 880px){
+  .orn--right .shard{ transform: scale(.9) }
+  .orn--bottom .leaf{ transform: scale(.9) }
+}
+@media (max-width: 720px){
+  .orn--left, .orn--right{ opacity:.75; filter: blur(.2px) }
+  .ambient--dust{ opacity:.35 }
+}
+@media (max-width: 640px){
+  .orn--left, .orn--right{ display:none }
+  .ambient--dust{ display:none }
+}
+
+/* --- Life Track: mniejsze węzły i ciaśniejsza rama na wąskich ekranach --- */
+@media (max-width: 980px){
+  .life-track{ left:16% !important; right:16% !important; top:28% !important; height:44% !important; }
+}
+@media (max-width: 880px){
+  .life-track{ left:14% !important; right:14% !important; }
+}
+@media (max-width: 720px){
+  .life-track{ left:12% !important; right:12% !important; top:26% !important; height:46% !important; }
+}
+@media (max-width: 640px){
+  .life-track{ left:10% !important; right:10% !important; }
+}
+
+/* --- Dotyk: większe cele na ekranach „coarse pointer” --- */
+@media (pointer: coarse){
+  .end-turn{ padding: 14px 22px; }
+  .chip{ padding: 10px 12px; }
+  .time .crystal{ width: 30px; height: 34px; }
+}
+
+/* --- Orientacja: w bardzo niskich oknach ukryj część ambientu --- */
+@media (max-height: 620px){
+  .ambient--glow{ opacity:.5 }
+  .ambient--dust{ display:none }
+}
+
+/* --- Jakość cieni: ogranicz przy bardzo dużych DPI/small screens --- */
+@media (max-width: 480px), (max-height: 560px){
+  .board{ filter: drop-shadow(0 8px 18px rgba(0,0,0,.12)); }
+  .chip, .panel, .time, .btn, .option, .overlay__dialog{
+    box-shadow: 0 8px 16px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.6) !important;
+  }
+}

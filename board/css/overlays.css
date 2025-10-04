@@ -1,0 +1,169 @@
+
+.overlay{
+  position: fixed; inset: 0; z-index: 60;
+  display: grid; place-items: center;
+  padding: 24px;
+  pointer-events: auto;
+}
+.overlay[hidden]{ display: none !important; }
+
+/* Backdrop + blur */
+.overlay::before{
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(80% 120% at 50% 40%, rgba(8,12,12,.72), rgba(8,12,12,.82) 60%, rgba(8,12,12,.88) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.45));
+  backdrop-filter: blur(4px) saturate(1.02);
+  -webkit-backdrop-filter: blur(4px) saturate(1.02);
+}
+
+/* Dialog */
+.overlay__dialog{
+  position: relative;
+  width: min(100%, 960px);
+  border-radius: calc(var(--radius) + 4px);
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.65), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, var(--parch-1), var(--parch-2));
+  border:1px solid var(--parch-edge);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.25),
+    inset 0 1px 0 rgba(255,255,255,.7),
+    inset 0 -18px 28px rgba(93,57,24,.10);
+  color: var(--ink);
+  overflow: clip;
+  transform: scale(.98) translateY(8px);
+  opacity: 0;
+  transition: transform .28s var(--ease-soft, cubic-bezier(.2,.8,.2,1)), opacity .28s ease;
+  padding: 18px;
+}
+.overlay[data-open="true"] .overlay__dialog{
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Header */
+.overlay__head{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  margin: 6px 6px 12px;
+}
+.overlay__title{
+  display:flex; align-items:center; gap:10px;
+  font-weight: 900; letter-spacing:.4px; font-size: clamp(18px, 1.6vw, 22px);
+  padding:10px 14px; border-radius: 12px;
+  color:#0b1816; border:1px solid transparent;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.8);
+}
+/* Tone colors for title badge */
+.overlay[data-tone="info"]   .overlay__title{ background: linear-gradient(180deg, #d8f6ff, #8fdcff); border-color:#89bdda; }
+.overlay[data-tone="good"]   .overlay__title{ background: linear-gradient(180deg, #c9ffdf, #98f2bb); border-color:#76d79b; }
+.overlay[data-tone="warn"]   .overlay__title{ background: linear-gradient(180deg, #ffe8b8, #ffd27a); border-color:#e1b85c; }
+.overlay[data-tone="neutral"] .overlay__title{ background: linear-gradient(180deg, #fff, #f6f9ff); border-color:#e1e8f0; }
+
+/* Close button (X) */
+.overlay__close{
+  appearance:none; border:none; cursor:pointer;
+  width:36px; height:36px; border-radius:999px;
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border:1px solid #e1e8f0; box-shadow: 0 8px 18px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.7);
+  color: var(--ink); font-weight: 900;
+}
+.overlay__close:hover{ filter: brightness(1.04) }
+.overlay__close:active{ transform: translateY(1px) }
+
+/* Body */
+.overlay__body{
+  background:#fff; border:1px solid #e9edf5; border-radius: 14px;
+  padding: 14px; color: var(--ink);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.6);
+}
+
+/* Actions row */
+.overlay__actions{
+  display:flex; flex-wrap: wrap; gap:10px; justify-content:flex-end;
+  margin-top: 14px;
+}
+.btn{
+  appearance:none; border:1px solid transparent; cursor:pointer;
+  padding:10px 14px; border-radius: 12px; font-weight: 900; letter-spacing:.3px;
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border-color:#e1e8f0; color: var(--ink);
+  box-shadow: 0 8px 18px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.7);
+}
+.btn--primary{ background: linear-gradient(180deg, #c9ffdf, #98f2bb); border-color:#76d79b; color:#0c3b2a }
+.btn--warn{    background: linear-gradient(180deg, #ffe8b8, #ffd27a); border-color:#e1b85c; color:#5b3e0a }
+.btn:active{ transform: translateY(1px) }
+
+/* ===== Event overlay specifics ===== */
+.overlay--event .overlay__dialog{
+  width: min(100%, 780px);
+}
+.overlay--event .overlay__body{
+  line-height: 1.5;
+}
+.overlay--event .meta{
+  display:flex; gap:10px; flex-wrap: wrap; margin: 6px 0 2px;
+  color: var(--ink-dim); font-weight:700;
+}
+
+/* ===== Decision overlay (Discover-like, no cards) ===== */
+.overlay--decision .overlay__dialog{
+  width: min(100%, 980px);
+}
+.choice-grid{
+  display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  margin-top: 6px;
+}
+@media (max-width: 920px){ .choice-grid{ grid-template-columns: repeat(2, 1fr) } }
+@media (max-width: 640px){ .choice-grid{ grid-template-columns: 1fr } }
+
+.option{
+  position: relative; border-radius: 14px; overflow:hidden;
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border:1px solid #e1e8f0; box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  min-height: 140px; display:grid; grid-template-rows: auto 1fr; gap:8px;
+  transition: transform .18s var(--ease-soft, cubic-bezier(.2,.8,.2,1)), box-shadow .18s ease, border-color .18s ease;
+}
+.option:hover{ transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0,0,0,.14) }
+.option:active{ transform: translateY(0) }
+.option:focus-visible{ outline: 3px solid #67c7d9; outline-offset: 2px; }
+
+.option__head{
+  display:flex; align-items:center; gap:10px; padding:10px 12px;
+  background: linear-gradient(180deg, #fff, #f3f7fb);
+  border-bottom:1px solid #e1e8f0; font-weight:900; letter-spacing:.3px;
+}
+.option__title{ flex:1 }
+.option__badge{
+  padding:6px 8px; border-radius:999px; font-size:12px; font-weight:900;
+  color:#0b1816; border:1px solid #e1e8f0;
+  background: linear-gradient(180deg, #ffe8b8, #ffd27a);
+}
+.option__body{
+  padding:10px 12px; color: var(--ink-dim);
+}
+
+/* Selected state (opcjonalnie: [aria-pressed=true] lub .is-selected) */
+.option[aria-pressed="true"],
+.option.is-selected{
+  border-color:#76d79b; box-shadow: 0 0 0 3px rgba(121,230,191,.35), 0 12px 26px rgba(0,0,0,.12);
+}
+
+/* Footer note / hint */
+.overlay__hint{
+  margin-top:10px; color: var(--ink-dim); font-size: 13px;
+}
+
+/* ===== Compact / responsive tweaks ===== */
+@media (max-width: 760px){
+  .overlay{ padding: 16px }
+  .overlay__dialog{ padding: 14px }
+  .overlay__actions{ justify-content: stretch }
+  .btn{ width:100% }
+}
+
+/* ===== Reduced motion ===== */
+@media (prefers-reduced-motion: reduce){
+  .overlay__dialog{ transition: none }
+}

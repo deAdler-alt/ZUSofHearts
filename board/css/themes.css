@@ -1,0 +1,124 @@
+.theme-corporate-mint {
+  /* drewno */
+  --wood-1:#cfa47a; --wood-2:#b28155; --wood-3:#8a5b35;
+  /* sukno */
+  --cloth-1:#eafff4; --cloth-2:#d9f6ea; --cloth-ring:#bfeada;
+  /* pergamin */
+  --parch-1:#f4e7d1; --parch-2:#e7d4b8; --parch-edge:#cbb391;
+  /* akcenty */
+  --gold:#e5c269; --mint:#79e6bf; --turq:#67c7d9; --rose:#ff7b86;
+  --ink:#1b2430; --ink-dim:#6b7a88;
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.18);
+  --shadow-sm: 0 10px 24px rgba(0,0,0,.12);
+}
+/* tło sceny – miękkie, jasne */
+.theme-corporate-mint .stage{
+  background:
+    radial-gradient(1200px 800px at 50% -10%, #ffffff 0%, #f7efe4 55%, #ecd7be 100%);
+}
+
+/* ========== DARK (granit + mięta) ========== */
+.theme-corporate-dark {
+  --wood-1:#8e6e4f; --wood-2:#6f543a; --wood-3:#513b27;
+  --cloth-1:#1c2a27; --cloth-2:#14211f; --cloth-ring:#27453e;
+  --parch-1:#2e3237; --parch-2:#262a2f; --parch-edge:#3b4148;
+  --gold:#ddb25a; --mint:#41d4ab; --turq:#58b6d1; --rose:#ff8fa3;
+  --ink:#e8eef2; --ink-dim:#aeb8c2;
+  --shadow-lg: 0 24px 60px rgba(0,0,0,.45);
+  --shadow-sm: 0 12px 28px rgba(0,0,0,.32);
+}
+/* ciemniejsze tło sceny */
+.theme-corporate-dark .stage{
+  background:
+    radial-gradient(1200px 840px at 50% -10%, #2b2f33 0%, #202427 50%, #161a1d 100%);
+}
+/* jaśniejsze chipy/panele na ciemnym */
+.theme-corporate-dark .chip,
+.theme-corporate-dark .time,
+.theme-corporate-dark .panel,
+.theme-corporate-dark .btn,
+.theme-corporate-dark [data-tip]::after,
+.theme-corporate-dark .option,
+.theme-corporate-dark .overlay__body,
+.theme-corporate-dark .overlay__dialog{
+  background: linear-gradient(180deg, #2f3439, #282c30) !important;
+  border-color: #3b4148 !important;
+  color: var(--ink) !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.08) !important;
+}
+/* fazy tury – przygaszone akcenty */
+.theme-corporate-dark .stage[data-phase="draw"]  .phase{
+  background: linear-gradient(180deg, color-mix(in oklab, #d8f6ff 60%, #2a3136), color-mix(in oklab, #8fdcff 60%, #273035));
+  border-color:#3c5361; color:#e7f6ff;
+}
+.theme-corporate-dark .stage[data-phase="play"]  .phase{
+  background: linear-gradient(180deg, color-mix(in oklab, #c9ffdf 60%, #25322d), color-mix(in oklab, #98f2bb 60%, #223029));
+  border-color:#36584a; color:#eaffe8;
+}
+.theme-corporate-dark .stage[data-phase="end"]   .phase{
+  background: linear-gradient(180deg, color-mix(in oklab, #ffe8b8 60%, #3a3322), color-mix(in oklab, #ffd27a 60%, #342d1e));
+  border-color:#5c4a2a; color:#fff6e0;
+}
+/* tooltip strzałka (ciemniejsza) */
+.theme-corporate-dark [data-tip]::before{
+  background: linear-gradient(180deg, #2f3439, #282c30);
+  border-left-color:#3b4148; border-top-color:#3b4148;
+}
+
+/* ========== SLATE (chłodny korpo-szary) ========== */
+.theme-corporate-slate {
+  --wood-1:#b6b9c2; --wood-2:#9aa0ad; --wood-3:#7a828f;
+  --cloth-1:#eef3f7; --cloth-2:#e3e9f1; --cloth-ring:#d0d9e6;
+  --parch-1:#f4f7fb; --parch-2:#e8edf5; --parch-edge:#d4dce8;
+  --gold:#d9c26e; --mint:#73dbc1; --turq:#7cbfe0; --rose:#ffa0a9;
+  --ink:#1c2430; --ink-dim:#5e6c7b;
+  --shadow-lg: 0 18px 48px rgba(33,40,51,.18);
+  --shadow-sm: 0 10px 22px rgba(33,40,51,.14);
+}
+/* tło sceny – chłodne, jasne */
+.theme-corporate-slate .stage{
+  background:
+    radial-gradient(1200px 840px at 50% -10%, #ffffff 0%, #f2f5f9 55%, #e3e8f0 100%);
+}
+
+/* ========== Drobne dostosowania komponentów pod theme ========== */
+/* odznaki/etykiety */
+.theme-corporate-dark .option__badge{
+  color:#0b1816; background: linear-gradient(180deg, #ffd27a, #e1b85c); border-color:#a27e33;
+}
+.theme-corporate-dark .goal{ background: #262a2e; border-color:#3b4148; }
+.theme-corporate-dark .goal .dot{ box-shadow: none; }
+.theme-corporate-dark .pile-meta .row{ background:#262a2e; border-color:#3b4148; }
+
+/* HUD bottom CTA – dopasowanie do theme */
+.theme-corporate-dark .end-turn{
+  background: linear-gradient(180deg, #2dd4bf, #22c4ab);
+  color: #07221b; border-color:#1ca691;
+  box-shadow: 0 6px 0 #157a6c, 0 12px 20px rgba(0,0,0,.42);
+}
+.theme-corporate-slate .end-turn{
+  background: linear-gradient(180deg, #c9ffdf, #98f2bb);
+  border-color:#8ddbb0; color:#0c3b2a;
+}
+
+/* Overlay backdrop w dark – ciemniejszy */
+.theme-corporate-dark .overlay::before{
+  background:
+    radial-gradient(80% 120% at 50% 40%, rgba(8,12,12,.82), rgba(8,12,12,.9) 60%, rgba(8,12,12,.94) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.65));
+  backdrop-filter: blur(5px) saturate(1.02);
+  -webkit-backdrop-filter: blur(5px) saturate(1.02);
+}
+
+/* Efekty — floater/ toast kolory czytelne w dark */
+.theme-corporate-dark .toast{ background: linear-gradient(180deg, #2d3338, #262b30); border-color:#3b4148; color:#e8eef2 }
+.theme-corporate-dark .floater{ border-color:#3b4148; color:#e8eef2; background: linear-gradient(180deg, #2d3338, #262b30) }
+
+/* Tooltips — neutralny ton w dark/silver */
+.theme-corporate-slate [data-tip]::after{
+  background: linear-gradient(180deg, #ffffff, #f4f7fb); border-color:#dfe6f0; color:#1c2430;
+}
+.theme-corporate-slate [data-tip]::before{
+  background: linear-gradient(180deg, #ffffff, #f4f7fb); border-left-color:#dfe6f0; border-top-color:#dfe6f0;
+}
+

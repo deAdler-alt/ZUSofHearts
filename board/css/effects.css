@@ -1,0 +1,166 @@
+
+.fx-layer{
+  position:absolute; inset:0; pointer-events:none; z-index:40;
+  /* działa nad stołem i panelami, pod overlayem (z-index:60) */
+}
+
+/* =========================================
+   TOASTS — rogi ekranu (domyślnie top-right)
+   ========================================= */
+.toast{
+  --gap: 12px;
+  position:absolute; top: calc(var(--gap) + (var(--i,0) * 56px)); right: var(--gap);
+  min-width: 220px; max-width: 360px;
+  padding:10px 12px 10px 44px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border:1px solid #e1e8f0;
+  box-shadow: 0 12px 26px rgba(0,0,0,.14), inset 0 2px 0 rgba(255,255,255,.7);
+  color: var(--ink); font-weight:800; letter-spacing:.2px;
+  opacity:0; transform: translateY(-8px);
+  animation: toast-seq .22s var(--ease-soft, cubic-bezier(.2,.8,.2,1)) forwards,
+             toast-hold 3.2s linear 0.22s forwards;
+}
+.toast::before{
+  content:"";
+  position:absolute; left:10px; top:50%; transform: translateY(-50%);
+  width:24px; height:24px; border-radius:8px;
+  display:grid; place-items:center;
+  background: linear-gradient(180deg, #fff, #f3f7fb);
+  border:1px solid #e1e8f0;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.8);
+  color:#0b1816; font-weight:900;
+}
+/* Ikonka wg typu (emoji dla szybkości) */
+.toast[data-kind="heal"]::before{ content:"❤️"; }
+.toast[data-kind="cash"]::before{ content:"💰"; }
+.toast[data-kind="risk"]::before{ content:"⚠️"; }
+.toast[data-kind="info"]::before{ content:"ℹ️"; }
+.toast[data-kind="edu"]::before{  content:"🎓"; }
+.toast[data-kind="job"]::before{  content:"💼"; }
+
+/* Pasek postępu (dół toasta) */
+.toast::after{
+  content:""; position:absolute; left:0; right:0; bottom:0; height:4px; border-radius:0 0 12px 12px;
+  background: linear-gradient(90deg, rgba(0,0,0,.06), rgba(0,0,0,.06));
+  overflow:hidden;
+}
+.toast[data-kind="heal"]::after{ background: linear-gradient(90deg, #bde8cc, #88d7aa) }
+.toast[data-kind="cash"]::after{ background: linear-gradient(90deg, #ffe8b8, #ffd27a) }
+.toast[data-kind="risk"]::after{ background: linear-gradient(90deg, #ffb3ad, #ff7b86) }
+.toast[data-kind="info"]::after{ background: linear-gradient(90deg, #d8f6ff, #8fdcff) }
+.toast[data-kind="edu"]::after{  background: linear-gradient(90deg, #dfefff, #9fd1ff) }
+.toast[data-kind="job"]::after{  background: linear-gradient(90deg, #c9ffdf, #98f2bb) }
+
+/* =========================================
+   FLOATERS — unoszące się liczby/teksty
+   ========================================= */
+.floater{
+  position:absolute; left: var(--x, 50%); top: var(--y, 50%);
+  transform: translate(-50%, -50%);
+  padding:6px 10px; border-radius: 12px;
+  font-weight:900; letter-spacing:.3px;
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border:1px solid #e1e8f0; color: var(--ink);
+  box-shadow: 0 10px 22px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.7);
+  opacity:0;
+  animation: float-up 1.2s ease-out forwards;
+  white-space: nowrap;
+}
+.floater[data-kind="heal"]{  color:#0e3a2c; border-color:#76d79b; background:linear-gradient(180deg,#c9ffdf,#98f2bb)}
+.floater[data-kind="cash"]{  color:#5b3e0a; border-color:#e1b85c; background:linear-gradient(180deg,#ffe8b8,#ffd27a)}
+.floater[data-kind="risk"]{  color:#5b0a1a; border-color:#ff7b86; background:linear-gradient(180deg,#ffd0d4,#ff9aae)}
+.floater[data-kind="info"]{  color:#0a2b4f; border-color:#89bdda; background:linear-gradient(180deg,#d8f6ff,#8fdcff)}
+
+/* =========================================
+   BURST — iskry w punkcie zdarzenia
+   ========================================= */
+.burst{
+  position:absolute; left: var(--x, 50%); top: var(--y, 50%);
+  width:16px; height:16px; transform: translate(-50%,-50%);
+  pointer-events:none;
+}
+.burst::before, .burst::after{
+  content:""; position:absolute; inset:0; border-radius:50%;
+  background:
+    radial-gradient(closest-side, rgba(255,255,255,.9), rgba(255,255,255,0) 70%),
+    radial-gradient(closest-side, rgba(121,230,191,.55), rgba(121,230,191,0) 70%);
+  filter: blur(1px);
+  animation: burst-pop .6s ease-out forwards;
+}
+.burst::after{
+  background:
+    radial-gradient(closest-side, rgba(185,150,255,.55), rgba(185,150,255,0) 70%),
+    radial-gradient(closest-side, rgba(255,215,130,.45), rgba(255,215,130,0) 70%);
+  animation-delay: .05s;
+}
+
+/* =========================================
+   RING PULSE — pulsujący pierścień podświetlenia
+   ========================================= */
+.ring-pulse{
+  position:absolute; left: var(--x, 50%); top: var(--y, 50%);
+  width:8px; height:8px; transform: translate(-50%,-50%);
+  pointer-events:none;
+}
+.ring-pulse::before, .ring-pulse::after{
+  content:""; position:absolute; inset:0; border-radius:50%; border: 3px solid rgba(121,230,191,.55);
+  animation: ring 1.2s ease-out infinite;
+}
+.ring-pulse::after{ animation-delay:.4s; border-color: rgba(103,199,217,.55) }
+
+/* =========================================
+   SCREEN FLASH — krótkie podbicie całego stołu
+   ========================================= */
+.screen-flash{
+  position:absolute; inset:0; pointer-events:none; opacity:0; z-index:41;
+  background: radial-gradient(80% 60% at 50% 40%, rgba(255,255,255,.24), rgba(255,255,255,0) 70%);
+  animation: flash .32s ease-out forwards;
+}
+.screen-flash[data-tone="warn"]{
+  background: radial-gradient(80% 60% at 50% 40%, rgba(255,123,134,.26), rgba(255,123,134,0) 70%);
+}
+.screen-flash[data-tone="good"]{
+  background: radial-gradient(80% 60% at 50% 40%, rgba(121,230,191,.26), rgba(121,230,191,0) 70%);
+}
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+@keyframes toast-seq{
+  to{ opacity:1; transform: translateY(0) }
+}
+@keyframes toast-hold{
+  0%  { opacity:1 }
+  85% { opacity:1 }
+  100%{ opacity:0; transform: translateY(-8px) }
+}
+
+@keyframes float-up{
+  0%   { opacity:0; transform: translate(-50%, -30%) scale(.98) }
+  20%  { opacity:1; transform: translate(-50%, -50%) scale(1) }
+  100% { opacity:0; transform: translate(-50%, -90%) scale(1.02) }
+}
+
+@keyframes burst-pop{
+  0%   { transform: scale(.6); opacity:.8 }
+  70%  { transform: scale(1.6); opacity:.9 }
+  100% { transform: scale(2.2); opacity:0 }
+}
+
+@keyframes ring{
+  0%   { transform: scale(.6); opacity:.75 }
+  80%  { transform: scale(2);   opacity:.0 }
+  100% { transform: scale(2.2); opacity:0 }
+}
+
+@keyframes flash{ from{ opacity:0 } to{ opacity:1 } }
+
+/* =========================================
+   REDUCED MOTION
+   ========================================= */
+@media (prefers-reduced-motion: reduce){
+  .toast, .floater, .burst::before, .burst::after, .ring-pulse::before, .ring-pulse::after, .screen-flash{
+    animation: none !important; opacity: 1 !important; transform: none !important;
+  }
+}

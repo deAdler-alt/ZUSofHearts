@@ -1,0 +1,108 @@
+
+:root{
+  --focus-ring: 3px solid #67c7d9;
+  --focus-offset: 2px;
+}
+
+/* —— Zerujemy domyślne focusy i włączamy :focus-visible —— */
+:where(
+  a, button, .end-turn, .btn, .option, .overlay__close,
+  [role="button"], [tabindex]:not([tabindex="-1"])
+){
+  outline: none;
+}
+:where(
+  a, button, .end-turn, .btn, .option, .overlay__close,
+  [role="button"], [tabindex]:not([tabindex="-1"])
+):focus-visible{
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+  border-radius: 10px;
+}
+
+/* Tooltip anchor też może dostać fokus (np. na ikonach) */
+[data-tip]:focus-visible{
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* —— Stany nieaktywne (spójne aria-disabled) —— */
+[aria-disabled="true"]{
+  cursor: not-allowed !important;
+  opacity: .6 !important;
+  filter: grayscale(.2) brightness(.96) !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* —— Prefers Reduced Motion —— */
+@media (prefers-reduced-motion: reduce){
+  html:focus-within{ scroll-behavior: auto; }
+  /* global stop dla animacji/przejść */
+  *, *::before, *::after{
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* —— Prefers MORE Contrast —— */
+@media (prefers-contrast: more){
+  /* wzmocnij krawędzie, uprość cienie */
+  .chip, .panel, .time, .btn, .option, .overlay__dialog,
+  .overlay__title, .stat, .goal, .phase{
+    box-shadow: none !important;
+    border-width: 2px !important;
+  }
+  .phase{ filter: saturate(1.05) contrast(1.05); }
+  /* większy, bardziej widoczny focus */
+  :where(
+    a, button, .end-turn, .btn, .option, .overlay__close,
+    [role="button"], [tabindex]:not([tabindex="-1"])
+  ):focus-visible{
+    outline-width: 4px;
+    outline-offset: 3px;
+  }
+}
+
+/* —— Forced Colors / Windows High Contrast —— */
+@media (forced-colors: active){
+  /* pozbądź się dekoracji, zostaw czytelność */
+  .ambient, .orn--left, .orn--right, .orn--bottom{ display:none !important; }
+  .overlay::before{ background: Canvas; opacity: .6; }
+
+  .chip, .panel, .time, .btn, .option, .overlay__dialog, .overlay__body, .overlay__title,
+  .stat, .goal, .phase{
+    background: Canvas !important;
+    color: CanvasText !important;
+    border: 1px solid ButtonText !important;
+    box-shadow: none !important;
+    forced-color-adjust: auto;
+  }
+  .end-turn{
+    background: Highlight !important;
+    color: HighlightText !important;
+    border-color: ButtonBorder !important;
+  }
+  /* focus w HCM */
+  :where(
+    a, button, .end-turn, .btn, .option, .overlay__close,
+    [role="button"], [tabindex]:not([tabindex="-1"])
+  ):focus-visible{
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/* —— Mikrooptymalizacje wydajności —— */
+/* Hardware compositing dla ruchomych warstw (mniej jank) */
+.cloth, .ribbon, .pawn, .ambient, .orn--right .shard, .overlay__dialog{
+  will-change: transform, opacity, filter;
+}
+/* Ogranicz kosztowne cienie na małych ekranach (już częściowo w M9) */
+@media (max-width: 480px), (max-height: 560px){
+  .chip, .panel, .time, .btn, .option, .overlay__dialog{
+    box-shadow: 0 8px 16px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.6) !important;
+  }
+}
