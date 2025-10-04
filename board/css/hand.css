@@ -1,0 +1,56 @@
+
+.hand{
+  position:absolute; left:8%; right:8%; bottom:92px;
+  height:46%; display:grid; place-items:end center;
+  pointer-events:none; z-index:19;
+  --n:0; --center: calc((var(--n) - 1) * 0.5);
+  --spread:56px; --tilt:5deg; --scale:1; --lift:0px;
+}
+.hand::before{
+  content:""; position:absolute; left:6%; right:6%; bottom:24px; height:56px;
+  border-radius:999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.15));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 -10px 26px rgba(0,0,0,.08);
+  filter: blur(.2px);
+}
+/* Skorupa każdej karty */
+.card-shell{
+  position:absolute; left:50%; bottom:0; pointer-events:auto; cursor:pointer;
+  width:142px; height:196px; transform-origin:50% 120%;
+  transform:
+    translateX(calc((var(--i) - var(--center)) * var(--spread)))
+    rotate(calc((var(--i) - var(--center)) * var(--tilt)))
+    translateY(var(--lift)) scale(var(--scale));
+  border-radius:16px/18px;
+  background: radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.65), rgba(255,255,255,0) 60%),
+              linear-gradient(180deg, #f5efe3, #e6d6bf);
+  border:1px solid #cbb391;
+  box-shadow: 0 18px 34px rgba(0,0,0,.18), 0 0 0 1px rgba(255,255,255,.7) inset, 0 -16px 26px rgba(93,57,24,.10) inset;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+.card-shell:hover,
+.card-shell[data-selected="true"]{
+  transform:
+    translateX(calc((var(--i) - var(--center)) * var(--spread)))
+    rotate(calc((var(--i) - var(--center)) * var(--tilt)))
+    translateY(calc(var(--lift) - 18px)) scale(calc(var(--scale) * 1.06));
+  z-index:21;
+  box-shadow: 0 26px 48px rgba(0,0,0,.22), 0 0 0 3px rgba(103,199,217,.35),
+              0 0 0 1px rgba(255,255,255,.8) inset, 0 -18px 28px rgba(93,57,24,.12) inset;
+}
+.card-shell[aria-disabled="true"]{ filter:grayscale(.35) brightness(.92); cursor:not-allowed }
+.card-shell .cost{
+  position:absolute; top:-8px; left:-8px; width:42px; height:42px; border-radius:50%;
+  background: linear-gradient(180deg, #d8f6ff, #8fdcff); border:2px solid #89bdda;
+  display:grid; place-items:center; font-weight:900;
+  box-shadow: 0 6px 14px rgba(0,0,0,.14), inset 0 2px 0 rgba(255,255,255,.8);
+}
+/* RWD wachlarza */
+@media (max-width:1200px){ .hand{ --spread:52px } .card-shell{ width:138px; height:190px } }
+@media (max-width:1060px){ .hand{ --spread:48px } .card-shell{ width:132px; height:184px } }
+@media (max-width:980px){  .hand{ left:7%; right:7%; bottom:90px; --spread:46px; --scale:.96 } }
+@media (max-width:900px){  .hand{ left:6%; right:6%; bottom:86px; --spread:44px; --scale:.92 } }
+@media (max-width:780px){  .hand{ left:5%; right:5%; bottom:84px; --spread:40px; --scale:.86 } .card-shell{ width:126px; height:176px } }
+@media (max-width:680px){  .hand{ left:4%; right:4%; --spread:36px; --scale:.80 } }
+@media (max-width:620px){  .hand{ left:3%; right:3%; bottom:80px; --spread:32px; --scale:.74 } .card-shell{ width:118px; height:168px } }
+@media (prefers-reduced-motion:reduce){ .card-shell{ transition:none } }

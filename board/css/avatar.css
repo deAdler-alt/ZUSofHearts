@@ -1,0 +1,35 @@
+
+.avatar{
+  position:absolute; left:14px; bottom:84px; width:116px; height:116px; z-index:20;
+  border-radius:50%; background: radial-gradient(100% 100% at 50% 30%, #ffffff, #f6f9ff);
+  border:1px solid #e1e8f0; box-shadow: 0 12px 28px rgba(0,0,0,.18), inset 0 2px 0 rgba(255,255,255,.7);
+  display:grid; place-items:center;
+}
+.avatar__ring{
+  position:absolute; inset:-6px; border-radius:50%;
+  box-shadow: 0 0 0 6px rgba(121,230,191,.25);
+  pointer-events:none;
+}
+/* status badge (np. wiek) */
+.avatar__badge{
+  position:absolute; right:-6px; bottom:-8px; min-width:34px; height:26px;
+  display:grid; place-items:center; padding:0 8px; font-weight:900; font-size:12px;
+  color:#0c3b2a; background:linear-gradient(180deg,#c9ffdf,#98f2bb);
+  border:1px solid #76d79b; border-radius:999px; box-shadow:0 4px 10px rgba(0,0,0,.12);
+}
+
+/* SVG skórka */
+.avatar svg{ width:86%; height:86% }
+
+/* Stany: healthy | tired | injured | old */
+.avatar[data-state="healthy"]        { --skin:#ffd7b3; --hair:#2f2a28; --mouth:#0b1816; --eye:#0b1816; --accent:#79e6bf }
+.avatar[data-state="tired"]          { --skin:#f2c7a6; --hair:#2f2a28; --mouth:#1b1b1b; --eye:#0b1816; --accent:#67c7d9 }
+.avatar[data-state="injured"]        { --skin:#f0bfb1; --hair:#2f2a28; --mouth:#7b0a1a; --eye:#0b1816; --accent:#ff7b86 }
+.avatar[data-state="old"]            { --skin:#e7c9a9; --hair:#b7b7b7; --mouth:#0b1816; --eye:#0b1816; --accent:#e5c269 }
+
+.avatar .bandage{ opacity:0 }
+.avatar[data-state="injured"] .bandage{ opacity:1 }
+.avatar .eye-bag{ opacity:0 }
+.avatar[data-state="tired"] .eye-bag{ opacity:.9 }
+
+.avatar .ring{ stroke: var(--accent); stroke-width:6; opacity:.35; }
