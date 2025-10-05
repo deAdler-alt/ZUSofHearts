@@ -3,57 +3,375 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ZUS Life — Stół gry (alive, no cards)</title>
-  <link rel="stylesheet" href="board.css">
-</head>
-<body>
-  <main class="stage">
-    <!-- Stół gry (responsywny, 16:9) -->
-    <section class="board" aria-label="Stół do gry — żywy, bez kart">
-      <!-- Rama drewna (pseudo-elementy robią bejce, słoje, ranty) -->
-      <div class="wood" aria-hidden="true"></div>
+  <title>ZUSofCards — Frontend (HTML+CSS only)</title>
 
-      <!-- Płótno stołu (mięta) -->
+  <!-- M0: BASE -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/board-base.css">
+
+  <!-- M1–M10: Core UI -->
+  <link rel="stylesheet" href="css/track.css">
+  <link rel="stylesheet" href="css/hud-top.css">
+  <link rel="stylesheet" href="css/hud-bottom.css">
+  <link rel="stylesheet" href="css/side-panels.css">
+  <link rel="stylesheet" href="css/overlays.css">
+  <link rel="stylesheet" href="css/effects.css">
+  <link rel="stylesheet" href="css/tooltips.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/a11y.css">
+
+  <!-- M12: Polish -->
+  <link rel="stylesheet" href="css/polish.css">
+
+  <!-- Dodatki: karty / avatar / przeciwnik / layout FHD -->
+  <link rel="stylesheet" href="css/avatar.css">
+  <link rel="stylesheet" href="css/opponent.css">
+  <link rel="stylesheet" href="css/layout-hd.css">
+
+  <!-- Anty-nachodzenie + baner tury + UX ręki -->
+  <link rel="stylesheet" href="css/layout-fullhd.css">
+  <link rel="stylesheet" href="css/turn-banner.css">
+
+  <!-- Rarity + Keywordy + Result + Tutorial + KPI ikony -->
+  <link rel="stylesheet" href="css/result.css">
+  <link rel="stylesheet" href="css/tutorial.css">
+  <link rel="stylesheet" href="css/kpi-icons.css">
+
+  <!-- Gałka skali stołu (ostatnia, żeby nadpisać wszystko) -->
+  <link rel="stylesheet" href="css/board-scale.css">
+  <link rel="stylesheet" href="css/cards-rail.css">
+
+</head>
+<body class="theme-corporate-mint" style="--board-scale:.88">
+  <main class="stage" data-phase="play">
+    <section class="board" aria-label="ZUSofCards — stół gry">
+
+      <!-- HUD TOP (M2) -->
+      <header class="hud--top" role="region" aria-label="Wskaźniki i faza tury">
+        <div class="kpi">
+          <div class="chip" data-kpi="health">
+            <span class="lbl">Zdrowie</span>
+            <span class="val" data-kpi="health">80/100</span>
+            <!-- <span class="trend">+8</span> opcjonalnie -->
+          </div>
+          <div class="chip" data-kpi="happy">
+            <span class="lbl">Szczęście</span>
+            <span class="val" data-kpi="happy">60/100</span>
+          </div>
+          <div class="chip" data-kpi="cash">
+            <span class="lbl">Oszczędności</span>
+            <span class="val" data-kpi="cash">2 000 zł</span>
+          </div>
+          <div class="chip" data-kpi="zus">
+            <span class="lbl">Kapitał ZUS</span>
+            <span class="val" data-kpi="zus">0 zł</span>
+          </div>
+        </div>
+        <div class="phase" aria-live="polite">FAZA: Zagrywanie</div>
+      </header>
+
+      <!-- Baner tury (turn-banner.css) -->
+      <div class="turn-banner" data-tone="play" data-show="true">
+        <span class="lbl">Twoja tura</span>
+        <span class="sub">Faza: Zagrywanie</span>
+      </div>
+
+      <!-- OPPONENT HUB (avatar + zakryta ręka) -->
+      <div class="op-avatar" aria-label="Przeciwnik">
+        <svg viewBox="0 0 120 120" role="img" aria-label="Avatar przeciwnika">
+          <circle cx="60" cy="60" r="50" fill="#eceff4"/>
+          <circle cx="60" cy="68" r="28" fill="#e6c8a8"/>
+          <circle cx="50" cy="66" r="3.2" fill="#0b1816"/>
+          <circle cx="70" cy="66" r="3.2" fill="#0b1816"/>
+          <path d="M24,56 C24,30 42,22 60,22 C78,22 96,30 96,56" stroke="#8089a3" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M48,82 Q60,78 72,82" stroke="#0b1816" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="badge">AI</div>
+      </div>
+      <div class="op-hand" style="--n:6" aria-hidden="true">
+        <i class="card-back" style="--i:0" data-rarity="common"></i>
+        <i class="card-back" style="--i:1" data-rarity="rare"></i>
+        <i class="card-back" style="--i:2" data-rarity="epic"></i>
+        <i class="card-back" style="--i:3" data-rarity="legendary"></i>
+        <i class="card-back" style="--i:4" data-rarity="common"></i>
+        <i class="card-back" style="--i:5" data-rarity="rare"></i>
+      </div>
+
+      <!-- Lewy panel (M4) -->
+      <aside class="side side--left" role="complementary" aria-label="Wskaźniki profilu">
+        <section class="panel">
+          <h3>Wskaźniki</h3>
+          <div class="stat"><span class="name">Edukacja</span><span class="value" data-ind="edu">Średnie</span></div>
+          <div class="stat"><span class="name">Praca</span><span class="value" data-ind="job">Brak</span></div>
+          <div class="stat"><span class="name">Rodzina</span><span class="value" data-ind="fam">Solo</span></div>
+        </section>
+        <section class="panel">
+          <h3>Cele scenariusza</h3>
+          <div class="goal" data-state="todo"><span class="dot"></span><span>Majątek netto ≥ 1 000 000 zł</span></div>
+          <div class="goal" data-state="ok"><span class="dot"></span><span>Dotrwaj do 65 r.ż.</span></div>
+          <div class="goal" data-state="todo"><span class="dot"></span><span>Średnie szczęście ≥ 65</span></div>
+        </section>
+      </aside>
+
+      <!-- Prawy panel (M4) -->
+      <aside class="side side--right" role="complementary" aria-label="Stosy">
+        <section class="panel">
+          <h3>Stosy</h3>
+          <div class="pile" data-pile="deck">
+            <div class="stack" data-size="23" aria-label="Talia: 23">
+              <i class="card-mini"></i><i class="card-mini"></i><i class="card-mini"></i>
+            </div>
+            <div class="pile-meta">
+              <div class="row"><span class="name">Talia</span><span class="value"><span class="count" data-count>23</span></span></div>
+              <div class="row"><span class="name">Zużyte</span><span class="value"><span class="count" data-count-used>7</span></span></div>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <!-- Rama + sukno + pergamin (M0) -->
+      <div class="wood" aria-hidden="true"></div>
       <div class="cloth">
-        <!-- Parchment (centrum na akcje backendu: bannery, komunikaty) -->
         <div class="parchment" role="img" aria-label="Pole centralne">
           <div class="parchment__shine" aria-hidden="true"></div>
           <div class="parchment__grain" aria-hidden="true"></div>
         </div>
 
-        <!-- Wstęgi (żyją bez JS) -->
+        <!-- Drop-zone (hand-ux.css) -->
+        <div class="play-dropzone" data-state="ready">
+          <span>Upuść kartę, aby zagrać</span>
+        </div>
+
+        <!-- Wstęgi -->
         <div class="ribbon ribbon--left" aria-hidden="true"></div>
         <div class="ribbon ribbon--right" aria-hidden="true"></div>
 
-        <!-- Ścieżka życia — slot na pionek (backend może go wstawić jako .pawn) -->
-        <div class="life-track" aria-label="Ścieżka życia">
-          <i class="node node--start" title="Start"></i>
-          <i class="node" title="Edukacja"></i>
-          <i class="node" title="Praca"></i>
+        <!-- Ścieżka życia (M1) -->
+        <div class="life-track"
+             style="position:absolute; left:18%; right:18%; top:28%; height:44%;"
+             data-active-index="2"
+             aria-label="Ścieżka życia">
+          <i class="node" data-complete="true" title="Start"></i>
+          <i class="node" data-complete="true" title="Edukacja"></i>
+          <i class="node" data-active="true" title="Praca"></i>
           <i class="node" title="Rodzina"></i>
           <i class="node" title="Dom"></i>
           <i class="node" title="ZUS"></i>
-          <i class="node node--finish" title="Meta"></i>
+          <i class="node" title="Meta"></i>
+          <i class="pawn" aria-hidden="true"></i>
         </div>
       </div>
 
-      <!-- Ozdoby: lewa „wieżyczka ZUS”, prawa grupa kryształów, dolne liście -->
-      <div class="orn orn--left" aria-hidden="true">
-        <div class="cap"></div><div class="pillar"></div><div class="moss"></div>
-      </div>
-      <div class="orn orn--right" aria-hidden="true">
-        <div class="shard s1"></div><div class="shard s2"></div><div class="shard s3"></div>
-        <div class="glow"></div>
-      </div>
-      <div class="orn orn--bottom" aria-hidden="true">
-        <div class="leaf l1"></div><div class="leaf l2"></div><div class="leaf l3"></div>
+      <!-- Avatar gracza (DOOM-style, avatar.css) -->
+      <div class="avatar" data-state="healthy" data-tip="Avatar postaci — stan">
+        <span class="avatar__ring" aria-hidden="true"></span>
+        <svg viewBox="0 0 120 120" role="img" aria-label="Avatar gracza">
+          <circle class="ring" cx="60" cy="60" r="54" fill="none"/>
+          <circle cx="60" cy="60" r="50" fill="#f4efe6"/>
+          <path d="M24,56 C24,30 42,22 60,22 C78,22 96,30 96,56 Z" fill="#2f2a28"/>
+          <circle cx="60" cy="68" r="28" fill="#ffd7b3"/>
+          <circle cx="50" cy="66" r="3.2" fill="#0b1816"/>
+          <circle cx="70" cy="66" r="3.2" fill="#0b1816"/>
+          <path d="M48,82 Q60,88 72,82" stroke="#0b1816" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="avatar__badge">30</div>
       </div>
 
-      <!-- Ambient: delikatny pył/poświaty (czysto CSS) -->
+      <div class="hand hand--rail" aria-label="Ręka gracza">
+        <!-- karty -->
+        <div class="card" data-rarity="common">
+          <i class="cost">2</i>
+          <div class="card__title">Praca na etat</div>
+          <div class="card__art"></div>
+          <div class="card__desc">Zysk: +2000 zł/mies. Zwiększ składki i bezpieczeństwo.</div>
+          <div class="card__tags">
+            <span class="tag kw" data-kw="economy">Dochód ↑</span>
+            <span class="tag kw" data-kw="zus">ZUS ↑</span>
+          </div>
+        </div>
+
+        <div class="card" data-rarity="rare">
+          <i class="cost">3</i>
+          <div class="card__title">Kontrakt B2B</div>
+          <div class="card__art"></div>
+          <div class="card__desc">Więcej netto, mniejsze świadczenia. Ryzyko kosztów.</div>
+          <div class="card__tags">
+            <span class="tag kw" data-kw="economy">Dochód ↑</span>
+            <span class="tag kw" data-kw="risk">Ryzyko</span>
+          </div>
+        </div>
+
+        <div class="card" data-rarity="epic" data-foil="true">
+          <i class="cost">4</i>
+          <div class="card__title">Inwestycja ETF</div>
+          <div class="card__art"></div>
+          <div class="card__desc">Szansa na wzrost kapitału długoterminowo.</div>
+          <div class="card__tags">
+            <span class="tag kw" data-kw="economy">Kapitał ↑</span>
+            <span class="tag kw" data-kw="risk">Ryzyko</span>
+          </div>
+        </div>
+
+        <div class="card" data-rarity="legendary" data-foil="true">
+          <i class="cost">1</i>
+          <div class="card__title">Urlop zdrowotny</div>
+          <div class="card__art"></div>
+          <div class="card__desc">Odzyskaj 10 zdrowia. Zużyj 1 czas.</div>
+          <div class="card__tags">
+            <span class="tag kw" data-kw="heal" data-kw-strong="true">Zdrowie ↑</span>
+          </div>
+        </div>
+
+        <div class="hand-count">4/10</div>
+      </div>
+
+
+      <!-- HUD DÓŁ (M3) -->
+      <section class="hud--bottom" role="region" aria-label="Czas i akcje">
+        <div class="time" data-time="4"><strong class="label">Czas</strong>
+          <i class="crystal"></i><i class="crystal"></i><i class="crystal"></i>
+          <i class="crystal"></i><i class="crystal"></i><i class="crystal"></i>
+        </div>
+        <button class="end-turn" aria-disabled="false">Zakończ rok</button>
+      </section>
+
+      <!-- Ozdoby + ambient -->
+      <div class="orn orn--left" aria-hidden="true"><div class="cap"></div><div class="pillar"></div><div class="moss"></div></div>
+      <div class="orn orn--right" aria-hidden="true"><div class="shard s1"></div><div class="shard s2"></div><div class="shard s3"></div><div class="glow"></div></div>
+      <div class="orn orn--bottom" aria-hidden="true"><div class="leaf l1"></div><div class="leaf l2"></div><div class="leaf l3"></div></div>
       <div class="ambient ambient--dust" aria-hidden="true"></div>
       <div class="ambient ambient--glow" aria-hidden="true"></div>
+      <div class="fx-layer" aria-live="polite"></div>
     </section>
   </main>
+
+  <!-- OVERLAYS (M5, M13, M16, M17) — domyślnie ukryte -->
+
+  <!-- EVENT -->
+  <section class="overlay overlay--event" data-tone="info" hidden aria-hidden="true">
+    <div class="overlay__dialog" role="dialog" aria-modal="true" aria-labelledby="event-title">
+      <div class="overlay__head">
+        <div class="overlay__title" id="event-title">Wydarzenie: Podwyżka składek</div>
+        <button class="overlay__close" aria-label="Zamknij">×</button>
+      </div>
+      <div class="overlay__body">
+        Zmieniono stawkę składki emerytalnej. Może to wpłynąć na Twój budżet w tym roku.
+        <div class="meta"><span>Składka: +2%</span><span>Wejście w życie: od teraz</span></div>
+      </div>
+      <div class="overlay__actions">
+        <button class="btn">OK</button>
+        <button class="btn btn--primary">Pokaż szczegóły</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DECISION -->
+  <section class="overlay overlay--decision" data-tone="neutral" hidden aria-hidden="true">
+    <div class="overlay__dialog" role="dialog" aria-modal="true" aria-labelledby="dec-title">
+      <div class="overlay__head">
+        <div class="overlay__title" id="dec-title">Wybierz decyzję</div>
+        <button class="overlay__close" aria-label="Zamknij">×</button>
+      </div>
+      <div class="overlay__body">
+        <div class="choice-grid" role="group" aria-label="Opcje decyzji">
+          <button class="option" aria-pressed="false">
+            <div class="option__head"><div class="option__title">Kontrakt B2B</div><div class="option__badge">Dochód ↑</div></div>
+            <div class="option__body">Więcej netto, mniejsze świadczenia.</div>
+          </button>
+          <button class="option" aria-pressed="false">
+            <div class="option__head"><div class="option__title">UoP z benefitami</div><div class="option__badge">Bezpieczeństwo</div></div>
+            <div class="option__body">Stabilność i wyższe składki na emeryturę.</div>
+          </button>
+          <button class="option" aria-pressed="false">
+            <div class="option__head"><div class="option__title">Urlop zdrowotny</div><div class="option__badge">Zdrowie</div></div>
+            <div class="option__body">Odzyskaj punkty zdrowia kosztem czasu w roku.</div>
+          </button>
+        </div>
+      </div>
+      <div class="overlay__actions">
+        <button class="btn">Anuluj</button>
+        <button class="btn btn--primary">Zatwierdź wybór</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- M13: MULLIGAN -->
+  <section class="overlay overlay--mulligan" data-tone="neutral" hidden aria-hidden="true">
+    <div class="overlay__dialog" role="dialog" aria-modal="true" aria-labelledby="mull-title">
+      <div class="overlay__head">
+        <div class="overlay__title" id="mull-title">Wybierz karty do wymiany</div>
+        <button class="overlay__close" aria-label="Zamknij">×</button>
+      </div>
+      <div class="overlay__body">
+        <div class="mulligan__hint">Zaznacz karty do wymiany (AI dobierze nowe z talii).</div>
+        <div class="mulligan-grid" role="group" aria-label="Karty do wymiany">
+          <div class="m-card"><div class="m-card__title">Praca na etat</div><div class="m-card__art"></div><div class="m-card__tags"><span class="m-tag">Dochód ↑</span></div></div>
+          <div class="m-card" data-swap="true"><div class="m-card__title">Kontrakt B2B</div><div class="m-card__art"></div><div class="m-card__tags"><span class="m-tag">Ryzyko</span></div></div>
+          <div class="m-card"><div class="m-card__title">Inwestycja ETF</div><div class="m-card__art"></div><div class="m-card__tags"><span class="m-tag">Kapitał ↑</span></div></div>
+          <div class="m-card"><div class="m-card__title">Urlop zdrowotny</div><div class="m-card__art"></div><div class="m-card__tags"><span class="m-tag">Zdrowie ↑</span></div></div>
+        </div>
+        <div class="mulligan__counter">Zamieniasz: 1/4</div>
+      </div>
+      <div class="overlay__actions">
+        <button class="btn">Anuluj</button>
+        <button class="btn btn--primary">Akceptuj i rozpocznij</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- M16: RESULT -->
+  <section class="overlay overlay--result" data-result="win" hidden aria-hidden="true">
+    <div class="overlay__dialog" role="dialog" aria-modal="true" aria-labelledby="res-title">
+      <div class="overlay__head">
+        <div class="overlay__title" id="res-title">
+          <span class="result__badge">Wygrana</span> Podsumowanie scenariusza
+        </div>
+        <button class="overlay__close" aria-label="Zamknij">×</button>
+      </div>
+      <div class="overlay__body">
+        <div class="result-grid">
+          <div class="result-card">
+            <h4>Stan postaci</h4>
+            <div class="r-row"><span class="name">Zdrowie</span><span class="val">90/100</span></div>
+            <div class="r-meter" style="--pct: 90%"><i></i></div>
+            <div class="r-row"><span class="name">Szczęście</span><span class="val">72/100</span></div>
+            <div class="r-meter" style="--pct: 72%"><i></i></div>
+          </div>
+          <div class="result-card">
+            <h4>Finanse</h4>
+            <div class="r-row"><span class="name">Oszczędności</span><span class="val">85 000 zł</span></div>
+            <div class="r-row"><span class="name">Kapitał ZUS</span><span class="val">250 000 zł</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="overlay__actions">
+        <button class="btn">Zagraj ponownie</button>
+        <button class="btn btn--primary">Powrót do menu</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- M17: TUTORIAL / COACH-MARKS -->
+  <section class="overlay overlay--tutorial" hidden aria-hidden="true"
+           style="--cx:50%; --cy:26%; --r:120px;" data-step="1">
+    <div class="overlay__dialog" role="dialog" aria-modal="true" aria-labelledby="tut-title">
+      <div class="overlay__head">
+        <div class="overlay__title" id="tut-title">Krótki tutorial</div>
+        <button class="overlay__close" aria-label="Zamknij">×</button>
+      </div>
+      <div class="overlay__body">
+        <div class="t-step" data-id="1"><strong>HUD u góry</strong> — tu masz zdrowie, szczęście, oszczędności i kapitał ZUS.</div>
+        <div class="t-step" data-id="2"><strong>Ręka kart</strong> — najedź, aby powiększyć; upuść w strefie „zagraj”.</div>
+        <div class="t-step" data-id="3"><strong>Ścieżka życia</strong> — postęp scenariusza; pionek przeskakuje po węzłach.</div>
+        <div class="tut-dots"><i></i><i></i><i></i></div>
+      </div>
+      <div class="overlay__actions">
+        <button class="btn">Wstecz</button>
+        <button class="btn btn--primary">Dalej</button>
+      </div>
+    </div>
+    <div class="tut-ring" aria-hidden="true"></div>
+  </section>
 </body>
 </html>
-

@@ -1,0 +1,153 @@
+
+.card[data-rarity]{
+  --rar-a:#dfe6f2; --rar-b:#c9d6e2;  /* common (fallback) */
+  --rar-glow: rgba(160,180,200,.35);
+  position: relative; z-index: 1;
+}
+.card[data-rarity="rare"]{
+  --rar-a:#bcd8ff; --rar-b:#6fa8ff; --rar-glow: rgba(111,168,255,.42);
+}
+.card[data-rarity="epic"]{
+  --rar-a:#d9b0ff; --rar-b:#a76bff; --rar-glow: rgba(167,107,255,.42);
+}
+.card[data-rarity="legendary"]{
+  --rar-a:#ffe39b; --rar-b:#ffae4b; --rar-glow: rgba(255,174,75,.46);
+}
+
+/* ——— Pierścień rzadkości dookoła karty ——— */
+.card[data-rarity]::before{
+  content:""; position:absolute; inset:-6px; padding:6px; border-radius:18px;
+  background: conic-gradient(from 0deg, var(--rar-a), var(--rar-b), var(--rar-a));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  filter: drop-shadow(0 8px 18px var(--rar-glow));
+  pointer-events:none; z-index:-1;
+}
+
+/* ——— „Klejnot” w narożniku (mini-diamond) ——— */
+.card[data-rarity]::after{
+  content:""; position:absolute; top:-10px; right:-10px; width:26px; height:26px;
+  background: linear-gradient(180deg, var(--rar-a), var(--rar-b));
+  border:2px solid color-mix(in oklab, var(--rar-b) 70%, #000);
+  box-shadow: 0 6px 14px var(--rar-glow), inset 0 2px 0 rgba(255,255,255,.8);
+  transform: rotate(45deg); border-radius:6px;
+  pointer-events:none;
+}
+
+/* ——— Tytuł i koszt reagują kolorem rzadkości ——— */
+.card[data-rarity] .card__title{
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.85);
+  border-color: color-mix(in oklab, var(--rar-b) 35%, #e1e8f0);
+}
+.card[data-rarity] .cost{
+  background: linear-gradient(180deg, var(--rar-a), var(--rar-b));
+  border-color: color-mix(in oklab, var(--rar-b) 55%, #89bdda);
+}
+
+/* ——— Efekt „foil” na arcie ——— */
+.card[data-foil="true"] .card__art{
+  position: relative; overflow:hidden;
+}
+.card[data-foil="true"] .card__art::after{
+  content:""; position:absolute; inset:-40% -20%; mix-blend-mode: overlay;
+  background:
+    linear-gradient(120deg,
+      rgba(255,255,255,.0) 0%,
+      rgba(255,255,255,.45) 18%,
+      rgba(255,255,255,.0) 36%),
+    conic-gradient(from 0deg, #9fc2f0, #98f2bb, #ffd27a, #ff9aae, #9fc2f0);
+  opacity:.55; filter: blur(2px);
+  animation: m14-foil 4.2s linear infinite;
+}
+@keyframes m14-foil{
+  0%{ transform: translate(-10%, -10%) rotate(0deg) }
+  100%{ transform: translate(10%, 10%) rotate(360deg) }
+}
+
+/* ——— Legendarka: delikatna „iskrząca” aura ——— */
+.card[data-rarity="legendary"] .card__title{
+  position: relative;
+}
+.card[data-rarity="legendary"] .card__title::after{
+  content:""; position:absolute; inset:-6px; border-radius:12px;
+  background:
+    radial-gradient(6px 6px at 10% 40%, rgba(255,255,255,.9), transparent 70%),
+    radial-gradient(5px 5px at 70% 20%, rgba(255,220,160,.9), transparent 70%),
+    radial-gradient(5px 5px at 40% 80%, rgba(255,255,255,.85), transparent 70%);
+  opacity:.7; filter: blur(.4px); pointer-events:none;
+}
+
+/* ——— Dark theme kontrast ——— */
+.theme-corporate-dark .card[data-rarity]::before{
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,.5));
+}
+.theme-corporate-dark .card[data-rarity] .card__title{
+  background: linear-gradient(180deg, #32373c, #2a2f34);
+  border-color: #3b4148;
+  color:#e8eef2;
+}
+
+.card[data-rarity] .card__title{
+  position: relative;
+  padding-left: 24px; /* miejsce na kropkę */
+}
+.card[data-rarity] .card__title::before{
+  content:""; position:absolute; left:8px; top:50%; transform:translateY(-50%);
+  width:10px; height:10px; border-radius:50%;
+  background: radial-gradient(closest-side, var(--rar-b), var(--rar-a));
+  box-shadow: 0 0 0 2px rgba(255,255,255,.9);
+}
+
+/* — rewersy przeciwnika: ring + tint wg rzadkości */
+.card-back[data-rarity]{
+  /* domyślne (common) — nadpisywane niżej */
+  --rar-a:#dfe6f2; --rar-b:#c9d6e2; --rar-glow: rgba(160,180,200,.35);
+  position: relative; z-index: 1;
+  border-color: color-mix(in oklab, var(--rar-b) 60%, #b7c6d6);
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.18),
+    0 0 0 1px rgba(255,255,255,.65) inset,
+    0 0 0 3px color-mix(in oklab, var(--rar-b) 22%, #0000);
+}
+/* ring dookoła rewersu */
+.card-back[data-rarity]::after{
+  content:""; position:absolute; inset:-6px; padding:6px; border-radius:16px;
+  background: conic-gradient(from 0deg, var(--rar-a), var(--rar-b), var(--rar-a));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  filter: drop-shadow(0 8px 18px var(--rar-glow));
+  pointer-events:none; z-index:-1;
+}
+/* kolorujemy emblemat na środku (::before było już użyte) */
+.card-back[data-rarity]::before{
+  background:
+    radial-gradient(closest-side, #ffffff, #e9f1f9 60%, transparent),
+    conic-gradient(from 0deg, var(--rar-a), var(--rar-b), var(--rar-a));
+  opacity:.85; filter: saturate(1.05) drop-shadow(0 8px 16px var(--rar-glow));
+}
+
+/* mapowanie kolorów */
+.card-back[data-rarity="rare"]{
+  --rar-a:#bcd8ff; --rar-b:#6fa8ff; --rar-glow: rgba(111,168,255,.42);
+}
+.card-back[data-rarity="epic"]{
+  --rar-a:#d9b0ff; --rar-b:#a76bff; --rar-glow: rgba(167,107,255,.42);
+}
+.card-back[data-rarity="legendary"]{
+  --rar-a:#ffe39b; --rar-b:#ffae4b; --rar-glow: rgba(255,174,75,.46);
+}
+
+/* dark theme dopalenie */
+.theme-corporate-dark .card-back[data-rarity]{
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.42),
+    0 0 0 1px rgba(255,255,255,.22) inset,
+    0 0 0 3px color-mix(in oklab, var(--rar-b) 28%, #0000);
+}
+.theme-corporate-dark .card[data-rarity] .card__title::before{
+  box-shadow: 0 0 0 2px rgba(0,0,0,.6);
+}

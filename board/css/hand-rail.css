@@ -1,0 +1,76 @@
+
+.hand.hand--rail{
+  position: absolute;
+  display: flex; justify-content: center; align-items: flex-end;
+  gap: 16px;
+  left: inherit; right: inherit;        /* bierze marginesy z layout-fullhd.css */
+  bottom: inherit; height: 260px;       /* trochę wyższy dok niż fan */
+  pointer-events: none; z-index: 29;
+  --peek: 78px;        /* ile karty „wystają” z doku (im więcej, tym mniej schowane) */
+  --rail-scale: .96;   /* bazowa skala kart w doku */
+}
+
+/* delikatna belka pod ręką */
+.hand.hand--rail::before{
+  content:""; position:absolute; left:6%; right:6%; bottom: 26px; height:64px;
+  border-radius:999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.18));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 -12px 24px rgba(0,0,0,.08);
+}
+
+/* Karta w doku — reset absolutów z trybu „fan” */
+.hand.hand--rail .card-shell{
+  position: relative; left:auto; bottom:auto;
+  width: 156px; height: 212px;
+  transform-origin: bottom center;
+  transform: translateY(var(--peek)) scale(var(--rail-scale));   /* schowana */
+  rotate: 0deg;                                                  /* bez wachlarza */
+  pointer-events:auto; cursor:pointer;
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+  z-index: 1;
+}
+
+/* Hover / selected — wysuń i powiększ; karta nad innymi */
+.hand.hand--rail .card-shell:hover,
+.hand.hand--rail .card-shell[data-selected="true"]{
+  transform: translateY(0) scale(1.08);
+  z-index: 40;
+  box-shadow:
+    0 28px 56px rgba(0,0,0,.24),
+    0 0 0 3px rgba(103,199,217,.30),
+    0 0 0 1px rgba(255,255,255,.85) inset,
+    0 -18px 28px rgba(93,57,24,.12) inset;
+}
+
+/* Stan playable/disabled zachowujemy (z poprzednich styli) */
+.hand.hand--rail .card-shell[aria-disabled="true"]{
+  filter: grayscale(.35) brightness(.92);
+}
+
+/* Licznik ręki — przy prawym dole doku */
+.hand.hand--rail .hand-count{
+  right: 14px; bottom: 20px; z-index: 41;
+}
+
+/* Responsywność — gdy mniej miejsca w pionie lub szerokości */
+@media (max-height: 820px){
+  .hand.hand--rail{ --peek: 68px; height: 240px }
+}
+@media (max-width: 1200px){
+  .hand.hand--rail{ gap: 14px }
+  .hand.hand--rail .card-shell{ width:150px; height:206px }
+}
+@media (max-width: 1020px){
+  .hand.hand--rail{ gap: 12px; --peek: 64px }
+  .hand.hand--rail .card-shell{ width:144px; height:198px }
+}
+
+/* Kompakt do bardzo wąskich/krótkich okien */
+@media (max-width: 900px), (max-height: 740px){
+  .hand.hand--rail{ --rail-scale:.92; --peek: 60px }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .hand.hand--rail .card-shell{ transition:none }
+}

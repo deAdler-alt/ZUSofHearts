@@ -1,0 +1,70 @@
+
+.overlay--tutorial .overlay__dialog{
+  width: min(100%, 960px);
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.65), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, var(--parch-1), var(--parch-2));
+  box-shadow: 0 36px 72px rgba(0,0,0,.28), inset 0 2px 0 rgba(255,255,255,.75);
+}
+
+/* Przyciemnienie sceny z „dziurą” — koło wokół celu */
+.overlay--tutorial::before{
+  content:""; position:fixed; inset:0; z-index: -1; /* leży pod dialogiem */
+  background: rgba(4, 12, 12, .65);
+  -webkit-mask:
+    radial-gradient(circle at var(--cx,50%) var(--cy,50%),
+                    transparent calc(var(--r,120px) - 1px),
+                    black calc(var(--r,120px) + 1px));
+          mask:
+    radial-gradient(circle at var(--cx,50%) var(--cy,50%),
+                    transparent calc(var(--r,120px) - 1px),
+                    black calc(var(--r,120px) + 1px));
+  backdrop-filter: blur(1.5px);
+}
+
+/* Ring + puls wokół celu */
+.tut-ring{
+  position:fixed; left:0; top:0; width:100vw; height:100vh; pointer-events:none;
+}
+.tut-ring::before, .tut-ring::after{
+  content:""; position:absolute;
+  left: calc(var(--cx,50%) - var(--r,120px)); top: calc(var(--cy,50%) - var(--r,120px));
+  width: calc(var(--r,120px) * 2); height: calc(var(--r,120px) * 2); border-radius:50%;
+  border: 3px solid color-mix(in oklab, var(--mint) 70%, #ffffff);
+  box-shadow: 0 0 0 6px rgba(121,230,191,.25);
+}
+.tut-ring::after{
+  border-color: color-mix(in oklab, var(--turq) 70%, #ffffff);
+  animation: tut-pulse 1.4s ease-out infinite;
+}
+@keyframes tut-pulse{
+  0%{ transform: scale(.9); opacity:.7 }
+  70%{ transform: scale(1.2); opacity:0 }
+  100%{ transform: scale(1.25); opacity:0 }
+}
+
+/* Treść kroku */
+.tut-steps{ display:flex; gap:12px; margin-top:6px; flex-wrap:wrap }
+.t-step{
+  background: #fff; border:1px solid #e1e8f0; border-radius:12px; padding:10px 12px;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.75); display:none;
+}
+.overlay--tutorial[data-step="1"] .t-step[data-id="1"],
+.overlay--tutorial[data-step="2"] .t-step[data-id="2"],
+.overlay--tutorial[data-step="3"] .t-step[data-id="3"]{ display:block }
+
+/* Pager kropek */
+.tut-dots{ display:flex; gap:6px; margin-top:10px }
+.tut-dots i{
+  width:10px; height:10px; border-radius:50%; background:#dfe6f2; border:1px solid #ccd6e4;
+}
+.overlay--tutorial[data-step="1"] .tut-dots i:nth-child(1),
+.overlay--tutorial[data-step="2"] .tut-dots i:nth-child(2),
+.overlay--tutorial[data-step="3"] .tut-dots i:nth-child(3){ background:#98f2bb; border-color:#76d79b }
+
+/* Ciemny motyw */
+.theme-corporate-dark .overlay--tutorial .overlay__dialog{
+  background: linear-gradient(180deg, #2f3439, #282c30);
+  border:1px solid #3b4148; color:#e8eef2;
+}
+.theme-corporate-dark .t-step{ background:#2f3439; border-color:#3b4148 }

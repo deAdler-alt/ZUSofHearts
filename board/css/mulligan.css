@@ -1,0 +1,79 @@
+
+.overlay--mulligan .overlay__dialog{
+  width: min(100%, 980px);
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.6), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, var(--parch-1), var(--parch-2));
+}
+.overlay--mulligan .overlay__title{
+  font-weight: 900; letter-spacing:.4px;
+}
+.mulligan__hint{
+  margin-top: 6px; font-weight: 800; color: var(--ink-dim);
+}
+
+/* siatka kart do podglądu */
+.mulligan-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+.m-card{
+  position: relative; height: 230px; border-radius: 16px/18px;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.65), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, #f5efe3, #e6d6bf);
+  border:1px solid #cbb391;
+  box-shadow: 0 16px 28px rgba(0,0,0,.16), inset 0 2px 0 rgba(255,255,255,.7);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.m-card:hover{ transform: translateY(-6px) }
+.m-card[aria-disabled="true"]{ filter: grayscale(.35) brightness(.92) }
+
+/* „mini-twarz” i nazwa (tytuł karty) – placeholder */
+.m-card__title{
+  position:absolute; left:10px; right:10px; top:10px;
+  height: 40px; border-radius:12px; display:grid; place-items:center;
+  font-weight:900; border:1px solid #e1e8f0;
+  background: linear-gradient(180deg,#ffffff,#f3f7fb);
+}
+.m-card__art{
+  position:absolute; left:12px; right:12px; top:58px; bottom:60px;
+  border-radius:10px; border:1px solid #e3e8f2;
+  background:
+    linear-gradient(135deg, rgba(0,0,0,.06), transparent 60%),
+    radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 60%);
+}
+.m-card__tags{
+  position:absolute; left:10px; right:10px; bottom:10px;
+  display:flex; gap:6px; flex-wrap:wrap;
+}
+.m-tag{
+  padding:4px 8px; border-radius:999px; font-size:12px; font-weight:800;
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border:1px solid #e1e8f0; color:var(--ink);
+}
+
+/* znacznik wymiany */
+.m-card::after{
+  content:"Zamień"; position:absolute; top:-8px; right:-8px;
+  min-width:70px; height:28px; display:grid; place-items:center;
+  border-radius:999px; font-weight:900; font-size:12px; letter-spacing:.2px;
+  background: linear-gradient(180deg, #ffd0d4, #ff9aae);
+  border:1px solid #ff7b86; color:#5a1b25;
+  box-shadow: 0 8px 18px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.7);
+  opacity:0; transform: translateY(-6px); transition: .15s ease;
+}
+.m-card[data-swap="true"]::after{ opacity:1; transform: translateY(0) }
+
+/* licznik kart do wymiany */
+.mulligan__counter{
+  margin-top:10px; font-weight:900; letter-spacing:.3px;
+  color: var(--ink-dim);
+}
+
+/* akcje */
+.overlay--mulligan .overlay__actions{
+  margin-top: 18px;
+}

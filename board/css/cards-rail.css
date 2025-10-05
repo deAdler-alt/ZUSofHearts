@@ -1,0 +1,155 @@
+:root{
+  --hand-left: 22%;
+  --hand-right: 22%;
+  --hand-bottom: 0px;   /* ← ODSUNIĘCIE RĘKI OD DOŁU */
+  --hand-gap: 16px;
+  --card-w: 156px; --card-h: 212px;
+  --rail-peek: 76px;      /* ← jak głęboko karty siedzą w doku */
+  --rail-scale: .96;
+}
+
+
+/* —— KONTENER RĘKI — tryb RAIL —— */
+.hand.hand--rail{
+  position:absolute;
+  left: var(--hand-left); right: var(--hand-right); bottom: var(--hand-bottom);
+  height: calc(var(--card-h) + var(--rail-peek) + 50px);
+  display:flex; justify-content:center; align-items:flex-end; gap: var(--hand-gap);
+  pointer-events:none; z-index:29;
+}
+
+/* delikatna belka pod ręką */
+.hand.hand--rail::before{
+  content:""; position:absolute; left:6%; right:6%; bottom: 26px; height:64px;
+  border-radius:999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.18));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 -12px 24px rgba(0,0,0,.08);
+}
+
+/* —— KARTA (layout + baza) —— */
+.hand.hand--rail .card,            /* preferowany selektor */
+.hand.hand--rail .card-shell{      /* dla zgodności ze starym HTML */
+  position: relative;
+  width: var(--card-w); height: var(--card-h);
+  transform-origin: bottom center;
+  transform: translateY(var(--rail-peek)) scale(var(--rail-scale));
+  pointer-events:auto; cursor:pointer; z-index:1;
+
+  border-radius:16px/18px;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.65), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, #f5efe3, #e6d6bf);
+  border:1px solid #cbb391;
+  box-shadow: 0 18px 34px rgba(0,0,0,.18), 0 0 0 1px rgba(255,255,255,.7) inset, 0 -16px 26px rgba(93,57,24,.10) inset;
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+
+/* wysunięcie i powiększenie na hover */
+.hand.hand--rail .card:hover,
+.hand.hand--rail .card[data-selected="true"],
+.hand.hand--rail .card-shell:hover,
+.hand.hand--rail .card-shell[data-selected="true"]{
+  transform: translateY(0) scale(1.08);
+  z-index:40;
+  box-shadow:
+    0 28px 56px rgba(0,0,0,.24),
+    0 0 0 3px rgba(103,199,217,.30),
+    0 0 0 1px rgba(255,255,255,.85) inset,
+    0 -18px 28px rgba(93,57,24,.12) inset;
+}
+
+/* stany */
+.hand.hand--rail .card[aria-disabled="true"],
+.hand.hand--rail .card-shell[aria-disabled="true"]{
+  filter: grayscale(.35) brightness(.92);
+  cursor: not-allowed;
+}
+
+/* —— ELEMENTY TWARZY KARTY —— */
+.card .cost, .card-shell .cost{
+  position:absolute; top:-8px; left:-8px; width:42px; height:42px; border-radius:50%;
+  display:grid; place-items:center; font-weight:900;
+  background: linear-gradient(180deg, #d8f6ff, #8fdcff); border:2px solid #89bdda;
+  box-shadow: 0 6px 14px rgba(0,0,0,.14), inset 0 2px 0 rgba(255,255,255,.8);
+}
+.card .card__title, .card-shell .card__title{
+  display:grid; place-items:center; text-align:center;
+  margin:10px 10px 6px; height:40px; border-radius:12px; font-weight:900; letter-spacing:.3px;
+  background: linear-gradient(180deg, #ffffff, #f3f7fb);
+  border:1px solid #e1e8f0; box-shadow: inset 0 2px 0 rgba(255,255,255,.75);
+}
+.card .card__art, .card-shell .card__art{
+  margin:0 12px; height:84px; border-radius:10px;
+  border:1px solid #e3e8f2; box-shadow: inset 0 2px 0 rgba(255,255,255,.65);
+  background:
+    linear-gradient(135deg, rgba(0,0,0,.06), transparent 60%),
+    radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 60%);
+}
+.card .card__desc, .card-shell .card__desc{
+  margin:8px 10px 6px; padding:8px; border-radius:10px;
+  background:#fff; border:1px solid #e9edf5; font-size:13px; line-height:1.35; color:#24313b;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.6);
+}
+.card .card__tags, .card-shell .card__tags{
+  display:flex; flex-wrap:wrap; gap:6px; margin:0 10px 10px;
+}
+.tag{ padding:4px 8px; border-radius:999px; font-size:12px; font-weight:800;
+  background: linear-gradient(180deg, #ffffff, #f6f9ff); border:1px solid #e1e8f0; color:#24313b }
+
+/* —— KEYWORDY (wbudowane) —— */
+.tag.kw{ position:relative; padding-left:26px; box-shadow: 0 10px 18px rgba(0,0,0,.10), inset 0 2px 0 rgba(255,255,255,.75); }
+.tag.kw::before{
+  content:""; position:absolute; left:8px; top:50%; transform:translateY(-50%);
+  width:10px; height:10px; border-radius:50%; box-shadow: 0 0 0 2px rgba(255,255,255,.95), 0 1px 3px rgba(0,0,0,.15);
+  background: var(--kw-a, #dfe6f2);
+}
+.tag.kw[data-kw="economy"]{ --kw-a: conic-gradient(#ffe39b,#e5c269,#ffe39b) }
+.tag.kw[data-kw="risk"]   { --kw-a: conic-gradient(#ffbe9b,#ff8b6b,#ffbe9b) }
+.tag.kw[data-kw="heal"]   { --kw-a: conic-gradient(#c9ffdf,#98f2bb,#c9ffdf) }
+.tag.kw[data-kw="zus"]    { --kw-a: conic-gradient(#dfe6f2,#c9d6e2,#dfe6f2) }
+.tag.kw[data-kw-strong="true"]{ transform: translateY(-1px) }
+
+/* —— RARITY (wbudowane) —— */
+.card[data-rarity], .card-shell[data-rarity]{ position:relative; z-index:1; --rar-a:#dfe6f2; --rar-b:#c9d6e2; --rar-glow:rgba(160,180,200,.35) }
+.card[data-rarity="rare"], .card-shell[data-rarity="rare"]{ --rar-a:#bcd8ff; --rar-b:#6fa8ff; --rar-glow:rgba(111,168,255,.42) }
+.card[data-rarity="epic"], .card-shell[data-rarity="epic"]{ --rar-a:#d9b0ff; --rar-b:#a76bff; --rar-glow:rgba(167,107,255,.42) }
+.card[data-rarity="legendary"], .card-shell[data-rarity="legendary"]{ --rar-a:#ffe39b; --rar-b:#ffae4b; --rar-glow:rgba(255,174,75,.46) }
+
+.card[data-rarity]::before, .card-shell[data-rarity]::before{
+  content:""; position:absolute; inset:-6px; padding:6px; border-radius:18px;
+  background: conic-gradient(from 0deg, var(--rar-a), var(--rar-b), var(--rar-a));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  filter: drop-shadow(0 8px 18px var(--rar-glow)); pointer-events:none; z-index:-1;
+}
+.card[data-rarity] .card__title, .card-shell[data-rarity] .card__title{ position:relative; padding-left:24px; }
+.card[data-rarity] .card__title::before,
+.card-shell[data-rarity] .card__title::before{
+  content:""; position:absolute; left:8px; top:50%; transform:translateY(-50%);
+  width:10px; height:10px; border-radius:50%;
+  background: radial-gradient(closest-side, var(--rar-b), var(--rar-a));
+  box-shadow: 0 0 0 2px rgba(255,255,255,.9);
+}
+
+/* —— LICZNIK RĘKI —— */
+.hand.hand--rail .hand-count{
+  position:absolute; right:14px; bottom: 20px; min-width:52px; height:30px; padding:0 10px;
+  display:grid; place-items:center; font-weight:900; letter-spacing:.3px; z-index:41;
+  border-radius:999px; background:linear-gradient(180deg,#ffffff,#f6f9ff);
+  border:1px solid #e1e8f0; color:#0b1816;
+  box-shadow: 0 10px 22px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.7);
+}
+
+/* —— RESPONSYWNOŚĆ —— */
+@media (min-width: 1600px){
+  :root{ --hand-left: 20%; --hand-right: 20%; --card-w: 162px; --card-h: 220px }
+}
+@media (max-width: 1280px){
+  :root{ --hand-left: 18%; --hand-right: 18%; --card-w: 150px; --card-h: 206px }
+}
+@media (max-height: 820px){
+  :root{ --rail-peek: 66px }
+}
+@media (prefers-reduced-motion: reduce){
+  .hand.hand--rail .card, .hand.hand--rail .card-shell{ transition:none }
+}

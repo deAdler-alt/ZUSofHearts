@@ -1,0 +1,80 @@
+
+.overlay--result .overlay__dialog{
+  width: min(100%, 980px);
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.65), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, var(--parch-1), var(--parch-2));
+  box-shadow: 0 36px 72px rgba(0,0,0,.28), inset 0 2px 0 rgba(255,255,255,.75);
+}
+
+/* nagłówek wynikowy */
+.result__badge{
+  display:inline-grid; place-items:center;
+  min-width: 140px; height: 44px; border-radius: 999px;
+  font-weight: 900; letter-spacing:.6px; text-transform: uppercase;
+  padding: 0 14px; margin-right: 10px;
+  border:1px solid; box-shadow: 0 10px 22px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.8);
+}
+.overlay--result[data-result="win"]    .result__badge{ background:linear-gradient(180deg,#c9ffdf,#98f2bb); border-color:#76d79b; color:#0c3b2a }
+.overlay--result[data-result="lose"]   .result__badge{ background:linear-gradient(180deg,#ffd0d4,#ff9aae); border-color:#ff7b86; color:#5a1b25 }
+.overlay--result[data-result="retire"] .result__badge{ background:linear-gradient(180deg,#ffe8b8,#ffd27a); border-color:#e1b85c; color:#4a3718 }
+
+/* grid ze statystykami */
+.result-grid{
+  display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top: 12px;
+}
+.result-card{
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border:1px solid #e1e8f0; border-radius:16px;
+  box-shadow: 0 14px 26px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.75);
+  padding:12px;
+}
+.result-card h4{ margin:0 0 8px 0; font-size:14px; color:#455463 }
+
+/* wiersze wyników */
+.r-row{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 10px; border-radius:12px; background:#fff; border:1px solid #e9edf5;
+  margin-top:8px;
+}
+.r-row .name{ font-weight:800; color:#5e6c7b }
+.r-row .val{ font-weight:900 }
+
+/* pasek postępu/ocena (opcjonalny) */
+.r-meter{
+  height:10px; border-radius:999px; background:#edf2f7; overflow:hidden;
+  border:1px solid #dfe7f0; margin-top:8px;
+}
+.r-meter > i{
+  display:block; height:100%;
+  background: linear-gradient(180deg, #c9ffdf, #98f2bb);
+  width: var(--pct, 50%);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.7);
+}
+
+/* sekcja CTA na dole */
+.overlay--result .overlay__actions{
+  margin-top: 16px;
+}
+
+/* confetti light (tylko WIN) */
+.overlay--result[data-result="win"] .overlay__dialog::after{
+  content:""; position:absolute; inset:-20px; pointer-events:none;
+  background:
+    radial-gradient(2px 2px at 20% 10%, rgba(255,215,130,.9), transparent 60%),
+    radial-gradient(2px 2px at 80% 20%, rgba(121,230,191,.9), transparent 60%),
+    radial-gradient(2px 2px at 35% 80%, rgba(111,168,255,.9), transparent 60%),
+    radial-gradient(2px 2px at 65% 60%, rgba(255,154,174,.9), transparent 60%);
+  opacity:.6;
+  animation: r-conf 6s linear infinite;
+}
+@keyframes r-conf{
+  0%{ background-position: 0 0, 0 0, 0 0, 0 0 }
+  100%{ background-position: 0 40px, 0 60px, 0 30px, 0 50px }
+}
+
+/* dark theme */
+.theme-corporate-dark .result-card{
+  background: linear-gradient(180deg, #32373c, #2a2f34);
+  border-color:#3b4148; color:#e8eef2;
+}
